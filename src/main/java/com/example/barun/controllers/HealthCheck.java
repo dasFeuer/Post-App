@@ -8,6 +8,6 @@ public class HealthCheck {
     String name = "Barun";
     @GetMapping("/")
     public String healthCheck(){
-        return "Hey, " + name + "! Working good.";
+        return "Hey, " + name + "! Working good and it's running well.";
     }
 }
