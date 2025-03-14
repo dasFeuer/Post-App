@@ -8,9 +8,11 @@ import com.example.barun.services.UserDetailsServiceImplementation;
 import com.example.barun.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -59,5 +61,33 @@ public class UserController{
     private ResponseEntity<List<User>> getAllUsers(){
         List<User> allUsers = userService.getAllUsers();
         return ResponseEntity.ok(allUsers);
+    }
+
+    @GetMapping("/{id}")
+    private ResponseEntity<User> getUserById(@PathVariable Long id){
+        User user = userService.getUserById(id);
+        if(user != null){
+            return new ResponseEntity<>(user, HttpStatus.FOUND);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/addImage")
+    private ResponseEntity<?> addUserImage(@RequestPart User user,
+                                           @RequestPart MultipartFile multipartFile) {
+        try {
+            User theUser = userService.addImage(user, multipartFile);
+            return new ResponseEntity<>(theUser, HttpStatus.CREATED);
+        } catch (Exception exception){
+            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}/image")
+    private ResponseEntity<byte[]> getImageByUserId(@PathVariable Long id){
+        User user = userService.getUserById(id);
+        byte[] imageFile = user.getImageData();
+        return ResponseEntity.ok().contentType(MediaType.valueOf(user.getImageType())).body(imageFile);
     }
 }

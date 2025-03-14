@@ -12,7 +12,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -53,5 +55,18 @@ public class UserService {
         } else {
             return "Fail!";
         }
+    }
+
+    public User addImage(User user, MultipartFile imageFile) throws IOException {
+        User theuser = new User();
+        user.setImageData(imageFile.getBytes());
+        user.setImageType(imageFile.getContentType());
+        user.setImageName(imageFile.getOriginalFilename());
+
+        return userRepository.save(theuser);
+    }
+
+    public User getUserById(Long id) {
+         return userRepository.findById(id).orElse(null);
     }
 }
