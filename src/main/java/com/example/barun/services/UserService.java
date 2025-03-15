@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -57,16 +58,21 @@ public class UserService {
         }
     }
 
-    public User addImage(User user, MultipartFile imageFile) throws IOException {
-        User theuser = new User();
-        user.setImageData(imageFile.getBytes());
-        user.setImageType(imageFile.getContentType());
-        user.setImageName(imageFile.getOriginalFilename());
-
-        return userRepository.save(theuser);
+    public User addImage(Long userId, MultipartFile imageFile) throws IOException {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if(optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setImageData(imageFile.getBytes());
+            user.setImageType(imageFile.getContentType());
+            user.setImageName(imageFile.getOriginalFilename());
+            return userRepository.save(user);
+        }else {
+            throw new IOException("User not found!");
+        }
     }
 
     public User getUserById(Long id) {
          return userRepository.findById(id).orElse(null);
     }
+
 }

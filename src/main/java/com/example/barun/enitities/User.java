@@ -1,5 +1,6 @@
 package com.example.barun.enitities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -15,6 +16,8 @@ public class User {
     private Long id;
 
     @Lob
+//    @Column(columnDefinition = "BYTEA") //=> BYTEA in PostgreSQL for large images data
+    @JsonIgnore
     private byte[] imageData;
 
     private String imageType;

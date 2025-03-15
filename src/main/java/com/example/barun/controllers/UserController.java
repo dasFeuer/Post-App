@@ -73,11 +73,11 @@ public class UserController{
         }
     }
 
-    @PostMapping("/addImage")
-    private ResponseEntity<?> addUserImage(@RequestPart User user,
-                                           @RequestPart MultipartFile multipartFile) {
+    @PostMapping("/{id}/addImage")
+    private ResponseEntity<?> addUserImage(@PathVariable("id") Long userId,
+                                           @RequestPart("file")MultipartFile multipartFile) {
         try {
-            User theUser = userService.addImage(user, multipartFile);
+            User theUser = userService.addImage(userId, multipartFile);
             return new ResponseEntity<>(theUser, HttpStatus.CREATED);
         } catch (Exception exception){
             return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
