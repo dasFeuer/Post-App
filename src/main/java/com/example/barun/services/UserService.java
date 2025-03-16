@@ -75,4 +75,40 @@ public class UserService {
          return userRepository.findById(id).orElse(null);
     }
 
+    public User patchUserInfo(Long id, User user) throws IOException {
+        Optional<User> existingUser = userRepository.findById(id);
+        if(existingUser.isPresent()) {
+            User updateUser = existingUser.get();
+            if (user.getUsername()!=null){
+                updateUser.setUsername(user.getUsername());
+            }
+            if (user.getEmail()!=null){
+                updateUser.setEmail(user.getEmail());
+            }
+            if (user.getFullName()!=null){
+                updateUser.setFullName(user.getFullName());
+            }
+            if (user.getPassword()!=null){
+                updateUser.setPassword(user.getPassword());
+            }
+            return userRepository.save(updateUser);
+        } else{
+            throw new IOException("User not found!");
+        }
+    }
+
+    public User updateUserInfo(Long id, User user) throws IOException {
+        Optional<User> existingUser = userRepository.findById(id);
+        if(existingUser.isPresent()) {
+            User updatedUser = existingUser.get();
+            updatedUser.setUsername(user.getUsername());
+            updatedUser.setEmail(user.getEmail());
+            updatedUser.setFullName(user.getFullName());
+            updatedUser.setPassword(user.getPassword());
+            return userRepository.save(updatedUser);
+        } else{
+            throw new IOException("User not found!");
+        }
+    }
+
 }

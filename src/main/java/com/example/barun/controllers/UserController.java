@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -89,5 +90,17 @@ public class UserController{
         User user = userService.getUserById(id);
         byte[] imageFile = user.getImageData();
         return ResponseEntity.ok().contentType(MediaType.valueOf(user.getImageType())).body(imageFile);
+    }
+
+    @PatchMapping("/{id}/patchData")
+    private ResponseEntity<User> patchUserData(@PathVariable Long id, @RequestBody User user) throws IOException {
+        User updatedUser = userService.patchUserInfo(id, user);
+        return ResponseEntity.ok().body(updatedUser);
+    }
+
+    @PutMapping("/{id}/updateData")
+    private ResponseEntity<User> updateData(@PathVariable Long id, @RequestBody User user) throws IOException {
+        User updatedUser = userService.updateUserInfo(id, user);
+        return ResponseEntity.ok().body(updatedUser);
     }
 }
