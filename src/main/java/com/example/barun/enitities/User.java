@@ -16,8 +16,8 @@ public class User {
     private Long id;
 
     @Lob
-//    @Column(columnDefinition = "BYTEA") //=> BYTEA in PostgreSQL for large images data
     @JsonIgnore
+//    @Column(columnDefinition = "BYTEA") //=> BYTEA in PostgreSQL for large images data
     private byte[] imageData;
 
     private String imageType;

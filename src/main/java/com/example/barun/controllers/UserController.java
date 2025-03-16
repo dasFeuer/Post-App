@@ -85,6 +85,17 @@ public class UserController{
         }
     }
 
+    @PutMapping("/{id}/updateImage")
+    private ResponseEntity<?> updateImage(@PathVariable("id") Long userId,
+                                           @RequestPart("file")MultipartFile multipartFile) {
+        try {
+            User theUser = userService.updateImage(userId, multipartFile);
+            return new ResponseEntity<>(theUser, HttpStatus.ACCEPTED);
+        } catch (Exception exception){
+            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/{id}/image")
     private ResponseEntity<byte[]> getImageByUserId(@PathVariable Long id){
         User user = userService.getUserById(id);
@@ -102,5 +113,12 @@ public class UserController{
     private ResponseEntity<User> updateData(@PathVariable Long id, @RequestBody User user) throws IOException {
         User updatedUser = userService.updateUserInfo(id, user);
         return ResponseEntity.ok().body(updatedUser);
+    }
+
+    @DeleteMapping("/{id}/deleteUser")
+    public void deleteUser(@PathVariable Long id){
+
+        userService.deleteUser(id);
+
     }
 }

@@ -71,6 +71,19 @@ public class UserService {
         }
     }
 
+    public User updateImage(Long userId, MultipartFile imageFile) throws IOException {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if(optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setImageData(imageFile.getBytes());
+            user.setImageType(imageFile.getContentType());
+            user.setImageName(imageFile.getOriginalFilename());
+            return userRepository.save(user);
+        } else {
+            throw new IOException("User not found!");
+        }
+    }
+
     public User getUserById(Long id) {
          return userRepository.findById(id).orElse(null);
     }
@@ -89,7 +102,7 @@ public class UserService {
                 updateUser.setFullName(user.getFullName());
             }
             if (user.getPassword()!=null){
-                updateUser.setPassword(user.getPassword());
+                updateUser.setPassword(passwordEncoder.encode(user.getPassword()));
             }
             return userRepository.save(updateUser);
         } else{
@@ -104,11 +117,15 @@ public class UserService {
             updatedUser.setUsername(user.getUsername());
             updatedUser.setEmail(user.getEmail());
             updatedUser.setFullName(user.getFullName());
-            updatedUser.setPassword(user.getPassword());
+            updatedUser.setPassword(passwordEncoder.encode(user.getPassword()));
             return userRepository.save(updatedUser);
         } else{
             throw new IOException("User not found!");
         }
+    }
+
+    public void deleteUser(Long id){
+        userRepository.deleteById(id);
     }
 
 }
