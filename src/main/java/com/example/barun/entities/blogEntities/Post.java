@@ -4,8 +4,10 @@ import com.example.barun.entities.userEntities.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.sql.Types;
 import java.util.Date;
 
 @Entity
@@ -28,6 +30,7 @@ public class Post {
 
     @Lob
     @JsonIgnore
+    @JdbcTypeCode(Types.LONGVARBINARY)
     private byte[] blogImageData;
 
     private String imageType;

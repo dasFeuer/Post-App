@@ -4,8 +4,11 @@ import com.example.barun.entities.blogEntities.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,9 +21,22 @@ public class User {
     @Column(nullable = false)
     private Long id;
 
+    /*
+
+        @JdbcTypeCode(Types.LONGVARBINARY) specifically tells the ORM (Object-Relational Mapping)
+        framework to use the JDBC type LONGVARBINARY when storing and retrieving the annotated field.
+        Types.LONGVARBINARY represents a binary large object (BYTEA)/(BLOB) etc. Depending upon databases.
+        Data type in SQL that can store a large amount of binary data.
+        It's commonly used for:
+
+        1. Storing images, audio, or video files
+        2. Persisting serialized Java objects
+        3. Handling any large binary content
+        4. Can be used with any SQL databases
+     */
     @Lob
     @JsonIgnore
-//    @Column(columnDefinition = "BYTEA") //=> BYTEA in PostgreSQL for large images data
+    @JdbcTypeCode(Types.LONGVARBINARY)
     private byte[] imageData;
 
     private String imageType;
