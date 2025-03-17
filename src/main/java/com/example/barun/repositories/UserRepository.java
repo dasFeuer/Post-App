@@ -1,6 +1,6 @@
 package com.example.barun.repositories;
 
-import com.example.barun.enitities.User;
+import com.example.barun.entities.userEntities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

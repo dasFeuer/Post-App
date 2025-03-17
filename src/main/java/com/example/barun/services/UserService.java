@@ -2,7 +2,7 @@ package com.example.barun.services;
 
 import com.example.barun.dto.LoginUserDto;
 import com.example.barun.dto.RegisterUserDto;
-import com.example.barun.enitities.User;
+import com.example.barun.entities.userEntities.User;
 import com.example.barun.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +32,7 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
 
-    @Transactional
+//    @Transactional
     public User registerTheUser(RegisterUserDto registerUserDto){
         User newUser = new User();
         newUser.setFullName(registerUserDto.getFullName());
@@ -46,6 +46,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    @Transactional
     public String verifyTheUser(LoginUserDto user){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 user.getUsername(),

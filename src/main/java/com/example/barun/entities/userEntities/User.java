@@ -1,11 +1,14 @@
-package com.example.barun.enitities;
+package com.example.barun.entities.userEntities;
 
+import com.example.barun.entities.blogEntities.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -35,6 +38,9 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)
@@ -122,5 +128,13 @@ public class User {
 
     public void setImageName(String imageName) {
         this.imageName = imageName;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
     }
 }

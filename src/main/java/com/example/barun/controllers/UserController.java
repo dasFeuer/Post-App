@@ -2,7 +2,7 @@ package com.example.barun.controllers;
 
 import com.example.barun.dto.LoginUserDto;
 import com.example.barun.dto.RegisterUserDto;
-import com.example.barun.enitities.User;
+import com.example.barun.entities.userEntities.User;
 import com.example.barun.services.JwtService;
 import com.example.barun.services.UserDetailsServiceImplementation;
 import com.example.barun.services.UserService;
