@@ -1,4 +1,4 @@
-package com.example.barun.entities.blogEntities;
+package com.example.barun.entities.postEntities;
 
 import com.example.barun.entities.userEntities.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;

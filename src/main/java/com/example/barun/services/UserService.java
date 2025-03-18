@@ -4,6 +4,7 @@ import com.example.barun.dto.LoginUserDto;
 import com.example.barun.dto.RegisterUserDto;
 import com.example.barun.entities.userEntities.User;
 import com.example.barun.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,7 +32,7 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
 
-//    @Transactional
+    @Transactional
     public User registerTheUser(RegisterUserDto registerUserDto){
         User newUser = new User();
         newUser.setFullName(registerUserDto.getFullName());

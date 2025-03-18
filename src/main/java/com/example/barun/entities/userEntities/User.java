@@ -1,11 +1,10 @@
 package com.example.barun.entities.userEntities;
 
-import com.example.barun.entities.blogEntities.Post;
+import com.example.barun.entities.postEntities.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Types;

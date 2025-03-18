@@ -1,10 +1,10 @@
 package com.example.barun.repositories;
 
-import com.example.barun.entities.blogEntities.Post;
+import com.example.barun.entities.postEntities.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BlogRepository extends JpaRepository<Post, Long> {
+public interface PostRepository extends JpaRepository<Post, Long> {
 
 }
