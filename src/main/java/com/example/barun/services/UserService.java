@@ -2,6 +2,7 @@ package com.example.barun.services;
 
 import com.example.barun.dto.LoginUserDto;
 import com.example.barun.dto.RegisterUserDto;
+import com.example.barun.entities.postEntities.Post;
 import com.example.barun.entities.userEntities.User;
 import com.example.barun.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -44,6 +45,14 @@ public class UserService {
 
     public List<User> getAllUsers(){
         return userRepository.findAll();
+    }
+
+    public void saveUser(User user){
+        userRepository.save(user);
+    }
+
+    public User getUserByUsername(String username){
+        return userRepository.findByUsername(username);
     }
 
     public String verifyTheUser(LoginUserDto user){

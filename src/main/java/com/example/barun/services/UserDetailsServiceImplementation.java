@@ -4,7 +4,6 @@ import com.example.barun.entities.userEntities.User;
 import com.example.barun.entities.userEntities.UserPrincipal;
 import com.example.barun.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

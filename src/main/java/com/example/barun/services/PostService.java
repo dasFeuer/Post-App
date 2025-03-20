@@ -3,7 +3,6 @@ package com.example.barun.services;
 import com.example.barun.entities.postEntities.Post;
 import com.example.barun.entities.userEntities.User;
 import com.example.barun.repositories.PostRepository;
-import com.example.barun.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +17,7 @@ public class PostService {
     private PostRepository postRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
+    private UserService userService;
 
     public Optional<Post> getBlogById(Long id){
         return postRepository.findById(id);
