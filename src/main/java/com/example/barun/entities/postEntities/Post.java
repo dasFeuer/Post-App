@@ -1,8 +1,8 @@
 package com.example.barun.entities.postEntities;
 
 import com.example.barun.entities.userEntities.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -13,6 +13,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "blogPost")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +28,7 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnoreProperties({"posts"})
     private User author;
 
     @Lob
