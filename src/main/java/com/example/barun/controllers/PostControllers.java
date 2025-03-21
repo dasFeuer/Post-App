@@ -1,13 +1,12 @@
 package com.example.barun.controllers;
 
 import com.example.barun.entities.postEntities.Post;
-import com.example.barun.entities.userEntities.User;
-import com.example.barun.repositories.UserRepository;
+import com.example.barun.entities.postEntities.PostRequestDto;
 import com.example.barun.services.PostService;
 import com.example.barun.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +21,11 @@ public class PostControllers {
     @Autowired
     private UserService userService;
 
+    @PostMapping("/createPost")
+    public ResponseEntity<Post> create(@RequestBody PostRequestDto postRequestDto){
+        Post createdPost = postService.createPostByUser(postRequestDto);
+        return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
+    }
 
     @GetMapping("/getAllPosts")
     public List<Post> findAllPost(){
