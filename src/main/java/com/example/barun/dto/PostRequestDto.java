@@ -1,4 +1,4 @@
-package com.example.barun.entities.postEntities;
+package com.example.barun.dto;
 
 
 public class PostRequestDto {

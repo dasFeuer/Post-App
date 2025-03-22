@@ -2,7 +2,6 @@ package com.example.barun.services;
 
 import com.example.barun.dto.LoginUserDto;
 import com.example.barun.dto.RegisterUserDto;
-import com.example.barun.entities.postEntities.Post;
 import com.example.barun.entities.userEntities.User;
 import com.example.barun.repositories.UserRepository;
 import jakarta.transaction.Transactional;

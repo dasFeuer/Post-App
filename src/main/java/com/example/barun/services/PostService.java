@@ -1,15 +1,18 @@
 package com.example.barun.services;
 
 import com.example.barun.entities.postEntities.Post;
-import com.example.barun.entities.postEntities.PostRequestDto;
+import com.example.barun.dto.PostRequestDto;
 import com.example.barun.entities.userEntities.User;
 import com.example.barun.repositories.PostRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,13 +25,14 @@ public class PostService {
     @Autowired
     private UserService userService;
 
-    public Post createPostByUser(PostRequestDto postRequestDto){
+    @Transactional
+    public Post createPostByUser(PostRequestDto postRequestDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User author = userService.getUserByUsername(username);
         System.out.println("Username: " + username);
 
-        if(!username.isEmpty()) {
+        if (!username.isEmpty()) {
             Post newPost = new Post();
             newPost.setTitle(postRequestDto.getTitle());
             newPost.setContent(postRequestDto.getContent());
@@ -40,17 +44,28 @@ public class PostService {
         }
     }
 
-    public Optional<Post> getBlogById(Long id){
+    public Optional<Post> getPostById(Long id) {
         return postRepository.findById(id);
     }
 
-    public List<Post> getAllBlogs(){
+    public List<Post> getAllPosts() {
         return postRepository.findAll();
     }
 
-    public void deleteBlogById(Long id){
+    public void deletePostById(Long id) {
         postRepository.deleteById(id);
     }
 
-
+    public Post addImage(Long postId, MultipartFile multipartFile) throws IOException {
+        Optional<Post> post = postRepository.findById(postId);
+        if (post.isPresent()) {
+            Post updatePost = post.get();
+            updatePost.setPostImageData(multipartFile.getBytes());
+            updatePost.setPostImageType(multipartFile.getContentType());
+            updatePost.setPostImageName(multipartFile.getOriginalFilename());
+            return postRepository.save(updatePost);
+        } else {
+            throw new IOException("Post not found!");
+        }
+    }
 }

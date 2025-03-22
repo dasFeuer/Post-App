@@ -101,8 +101,10 @@ public class UserController{
     @GetMapping("/{id}/image")
     private ResponseEntity<byte[]> getImageByUserId(@PathVariable Long id){
         User user = userService.getUserById(id);
-        byte[] imageFile = user.getImageData();
-        return ResponseEntity.ok().contentType(MediaType.valueOf(user.getImageType())).body(imageFile);
+        byte[] imageFile = user.getImageData(); // --> Not Optional<User> = user.getImageData()
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf(user.getImageType()))
+                .body(imageFile);
     }
 
     @PatchMapping("/{id}/patchData")

@@ -34,11 +34,11 @@ public class Post {
     @Lob
     @JsonIgnore
     @JdbcTypeCode(Types.LONGVARBINARY)
-    private byte[] blogImageData;
+    private byte[] postImageData;
 
-    private String imageType;
+    private String postImageType;
 
-    private String imageName;
+    private String postImageName;
 
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)
@@ -81,28 +81,28 @@ public class Post {
         this.author = author;
     }
 
-    public byte[] getBlogImageData() {
-        return blogImageData;
+    public byte[] getPostImageData() {
+        return postImageData;
     }
 
-    public void setBlogImageData(byte[] blogImageData) {
-        this.blogImageData = blogImageData;
+    public void setPostImageData(byte[] postImageData) {
+        this.postImageData = postImageData;
     }
 
-    public String getImageType() {
-        return imageType;
+    public String getPostImageType() {
+        return postImageType;
     }
 
-    public void setImageType(String imageType) {
-        this.imageType = imageType;
+    public void setPostImageType(String postImageType) {
+        this.postImageType = postImageType;
     }
 
-    public String getImageName() {
-        return imageName;
+    public String getPostImageName() {
+        return postImageName;
     }
 
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
+    public void setPostImageName(String postImageName) {
+        this.postImageName = postImageName;
     }
 
     public Date getCreatedAt() {
