@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -67,5 +68,46 @@ public class PostService {
         } else {
             throw new IOException("Post not found!");
         }
+    }
+
+    public Post updateImage(Long postId, MultipartFile multipartFile) throws IOException {
+        Optional<Post> post = postRepository.findById(postId);
+        if (post.isPresent()) {
+            Post updatePost = post.get();
+            updatePost.setPostImageData(multipartFile.getBytes());
+            updatePost.setPostImageType(multipartFile.getContentType());
+            updatePost.setPostImageName(multipartFile.getOriginalFilename());
+            return postRepository.save(updatePost);
+        } else {
+            throw new IOException("Post not found!");
+        }
+    }
+
+
+    public Post updatePost(Long postId, PostRequestDto postRequestDto) throws Exception {
+        Optional<Post> existingPost = postRepository.findById(postId);
+        if(existingPost.isPresent()){
+            Post updatedPost = existingPost.get();
+            updatedPost.setTitle(postRequestDto.getTitle());
+            updatedPost.setContent(postRequestDto.getContent());
+            return postRepository.save(updatedPost);
+        } else {
+            throw new IOException("Post not found");
+        }
+    }
+
+    public Post patchPost(Long postId, PostRequestDto postRequestDto) throws Exception {
+        Optional<Post> existingPost = postRepository.findById(postId);
+        if(existingPost.isPresent()){
+            Post updatedPost = existingPost.get();
+            if(postRequestDto.getTitle() != null){
+                updatedPost.setTitle(postRequestDto.getTitle());
+            }
+            if(postRequestDto.getContent() != null){
+                updatedPost.setContent(postRequestDto.getContent());
+            }
+            return postRepository.save(updatedPost);
+        }
+        throw new IOException("Post not found");
     }
 }
