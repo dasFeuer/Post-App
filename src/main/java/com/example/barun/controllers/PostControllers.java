@@ -97,4 +97,55 @@ public class PostControllers {
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
+    @PutMapping("{postId}/updatePostImage")
+    public ResponseEntity<Post> updateImage(
+            @PathVariable Long postId,
+            @RequestPart("file") MultipartFile multipartFile)
+            throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        List<Post> postImageOfLoginUser = loggedInUser.getPosts();
+
+        if(!postImageOfLoginUser.isEmpty()){
+            Post post = postService.updateImage(postId, multipartFile);
+            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping("{postId}/updatePost")
+    public ResponseEntity<Post> updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostRequestDto postRequestDto)
+            throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        List<Post> postOfLoginUser = loggedInUser.getPosts();
+
+        if(!postOfLoginUser.isEmpty()){
+            Post post = postService.updatePost(postId, postRequestDto);
+            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PatchMapping("{postId}/patchPost")
+    public ResponseEntity<Post> patchPost(
+            @PathVariable Long postId,
+            @RequestBody PostRequestDto postRequestDto)
+            throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        List<Post> postOfLoginUser = loggedInUser.getPosts();
+
+        if(!postOfLoginUser.isEmpty()){
+            Post post = postService.patchPost(postId, postRequestDto);
+            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 }
