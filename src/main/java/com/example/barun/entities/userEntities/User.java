@@ -1,5 +1,6 @@
 package com.example.barun.entities.userEntities;
 
+import com.example.barun.entities.commentEntities.Comments;
 import com.example.barun.entities.postEntities.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

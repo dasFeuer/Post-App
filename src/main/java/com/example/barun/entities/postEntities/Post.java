@@ -1,5 +1,6 @@
 package com.example.barun.entities.postEntities;
 
+import com.example.barun.entities.commentEntities.Comments;
 import com.example.barun.entities.userEntities.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -9,7 +10,9 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "blogPost")
@@ -39,6 +42,10 @@ public class Post {
     private String postImageType;
 
     private String postImageName;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JsonIgnoreProperties({"author"})
+    private List<Comments> comments = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)
@@ -119,5 +126,13 @@ public class Post {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Comments> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comments> comments) {
+        this.comments = comments;
     }
 }

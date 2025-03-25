@@ -1,6 +1,5 @@
 package com.example.barun.dto;
 
-
 public class PostRequestDto {
     private String title;
 
