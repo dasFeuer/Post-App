@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,11 +34,39 @@ public class CommentService {
         Optional<Post> existingPost = postService.getPostById(postId);
 
         if(existingPost.isPresent()) {
+            Post thepost = existingPost.get();
             Comments newComment = new Comments();
             newComment.setComment(commentDto.getComment());
+            newComment.setPost(thepost);
             newComment.setAuthor(existingUser);
             return commentRepository.save(newComment);
         }
         throw new IOException("Post not found!");
+    }
+
+    public Optional<Comments> getCommentsById(Long commentId){
+        return commentRepository.findById(commentId);
+    }
+
+    public void deleteCommentById(Long commentId){
+        commentRepository.deleteById(commentId);
+    }
+
+    public void deleteAllComments(){
+        commentRepository.deleteAll();
+    }
+
+    public Comments updateComments(Long commentId, CommentDto commentDto){
+        Optional<Comments> existingComment = commentRepository.findById(commentId);
+        if(existingComment.isPresent()){
+            Comments updateComments = existingComment.get();
+            updateComments.setComment(commentDto.getComment());
+            commentRepository.save(updateComments);
+        }
+        return existingComment.orElseThrow();
+    }
+
+    public List<Comments> findAllComments() {
+        return commentRepository.findAll();
     }
 }

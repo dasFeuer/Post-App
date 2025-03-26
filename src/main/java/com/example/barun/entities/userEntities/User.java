@@ -59,8 +59,12 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"author"})
+    @JsonIgnoreProperties({"author", "comments"})
     private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"author", "post"})
+    private List<Comments> comments = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)

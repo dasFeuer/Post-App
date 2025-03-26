@@ -44,7 +44,7 @@ public class Post {
     private String postImageName;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JsonIgnoreProperties({"author"})
+    @JsonIgnoreProperties({"post", "author"})
     private List<Comments> comments = new ArrayList<>();
 
     @CreationTimestamp

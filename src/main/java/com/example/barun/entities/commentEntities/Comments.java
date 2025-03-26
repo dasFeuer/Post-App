@@ -2,6 +2,7 @@ package com.example.barun.entities.commentEntities;
 
 import com.example.barun.entities.postEntities.Post;
 import com.example.barun.entities.userEntities.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,12 +18,12 @@ public class Comments {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-//    @JsonIgnoreProperties({"comments"})
+    @JsonIgnoreProperties({"comments", "author"})
     private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-//    @JsonIgnoreProperties({"comments"})
+    @JsonIgnoreProperties({"comments", "posts"})
     private Post post;
 
     public Long getId() {
