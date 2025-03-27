@@ -62,40 +62,64 @@ public class UserController{
 
     @GetMapping("/allUsers")
     private ResponseEntity<List<User>> getAllUsers(){
-        List<User> allUsers = userService.getAllUsers();
-        return ResponseEntity.ok(allUsers);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        if(loggedInUser != null) {
+            List<User> allUsers = userService.getAllUsers();
+            return ResponseEntity.ok(allUsers);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/{id}")
     private ResponseEntity<User> getUserById(@PathVariable Long id){
-        User user = userService.getUserById(id);
-        if(user != null){
-            return new ResponseEntity<>(user, HttpStatus.FOUND);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        if(loggedInUser != null) {
+            User user = userService.getUserById(id);
+            if(user != null){
+                return new ResponseEntity<>(user, HttpStatus.FOUND);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/{id}/addImage")
     private ResponseEntity<?> addUserImage(@PathVariable("id") Long userId,
                                            @RequestPart("file")MultipartFile multipartFile) {
-        try {
-            User theUser = userService.addImage(userId, multipartFile);
-            return new ResponseEntity<>(theUser, HttpStatus.CREATED);
-        } catch (Exception exception){
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        if (loggedInUser != null) {
+            try {
+                User theUser = userService.addImage(userId, multipartFile);
+                return new ResponseEntity<>(theUser, HttpStatus.CREATED);
+            } catch (Exception exception) {
+                return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PutMapping("/{id}/updateImage")
     private ResponseEntity<?> updateImage(@PathVariable("id") Long userId,
                                            @RequestPart("file")MultipartFile multipartFile) {
-        try {
-            User theUser = userService.updateImage(userId, multipartFile);
-            return new ResponseEntity<>(theUser, HttpStatus.ACCEPTED);
-        } catch (Exception exception){
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        if (loggedInUser != null) {
+            try {
+                User theUser = userService.updateImage(userId, multipartFile);
+                return new ResponseEntity<>(theUser, HttpStatus.ACCEPTED);
+            } catch (Exception exception){
+                return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/{id}/image")
@@ -109,25 +133,47 @@ public class UserController{
 
     @PatchMapping("/{id}/patchData")
     private ResponseEntity<User> patchUserData(@PathVariable Long id, @RequestBody User user) throws IOException {
-        User updatedUser = userService.patchUserInfo(id, user);
-        return ResponseEntity.ok().body(updatedUser);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        if(loggedInUser != null){
+            User updatedUser = userService.patchUserInfo(id, user);
+            return ResponseEntity.ok().body(updatedUser);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PutMapping("/{id}/updateData")
     private ResponseEntity<User> updateData(@PathVariable Long id, @RequestBody User user) throws IOException {
-        User updatedUser = userService.updateUserInfo(id, user);
-        return ResponseEntity.ok().body(updatedUser);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        if(loggedInUser != null) {
+            User updatedUser = userService.updateUserInfo(id, user);
+            return ResponseEntity.ok().body(updatedUser);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/{id}/deleteUser")
     public void deleteUser(@PathVariable Long id){
-
-        userService.deleteUser(id);
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        if(loggedInUser != null) {
+            userService.deleteUser(id);
+        }
     }
 
-    @GetMapping("/{username}/username")
-    public User getByUsername(@PathVariable String username){
-        return userService.getUserByUsername(username);
+    @GetMapping("/{userUsername}/username")
+    public ResponseEntity<User> getByUsername(@PathVariable String userUsername){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        if(loggedInUser != null) {
+            User userByUsername = userService.getUserByUsername(userUsername);
+            return new ResponseEntity<>(userByUsername, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
