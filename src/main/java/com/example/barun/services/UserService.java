@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,12 +35,17 @@ public class UserService {
 
     @Transactional
     public User registerTheUser(RegisterUserDto registerUserDto){
-        User newUser = new User();
-        newUser.setFullName(registerUserDto.getFullName());
-        newUser.setUsername(registerUserDto.getUsername());
-        newUser.setEmail(registerUserDto.getEmail());
-        newUser.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
-        return userRepository.save(newUser);
+        try{
+            User newUser = new User();
+            newUser.setFullName(registerUserDto.getFullName());
+            newUser.setUsername(registerUserDto.getUsername());
+            newUser.setEmail(registerUserDto.getEmail());
+            newUser.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
+            return userRepository.save(newUser);
+        } catch (Exception e){
+            throw new RuntimeException("User valid input! " + e);
+        }
+
     }
 
     public List<User> getAllUsers(){
@@ -55,14 +61,18 @@ public class UserService {
     }
 
     public String verifyTheUser(LoginUserDto user){
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                user.getUsername(),
-                user.getPassword()
-        ));
-        if(authentication.isAuthenticated()){
-            return jwtService.generateToken(user.getUsername());
-        } else {
-            return "Fail!";
+        try{
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    user.getUsername(),
+                    user.getPassword()
+            ));
+            if(authentication.isAuthenticated()){
+                return jwtService.generateToken(user.getUsername());
+            } else {
+                return "Fail!";
+            }
+        } catch (Exception e){
+            throw new RuntimeException("User valid input! " + e);
         }
     }
 

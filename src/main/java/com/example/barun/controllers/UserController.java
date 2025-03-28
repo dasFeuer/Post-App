@@ -65,9 +65,13 @@ public class UserController{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User loggedInUser = userService.getUserByUsername(username);
-        if(loggedInUser != null) {
-            List<User> allUsers = userService.getAllUsers();
-            return ResponseEntity.ok(allUsers);
+        try{
+            if(loggedInUser != null) {
+                List<User> allUsers = userService.getAllUsers();
+                return ResponseEntity.ok(allUsers);
+            }
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -78,11 +82,15 @@ public class UserController{
         String username = authentication.getName();
         User loggedInUser = userService.getUserByUsername(username);
         if(loggedInUser != null) {
-            User user = userService.getUserById(id);
-            if(user != null){
-                return new ResponseEntity<>(user, HttpStatus.FOUND);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            try{
+                User user = userService.getUserById(id);
+                if(user != null){
+                    return new ResponseEntity<>(user, HttpStatus.FOUND);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+            } catch (Exception e){
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -124,11 +132,16 @@ public class UserController{
 
     @GetMapping("/{id}/image")
     private ResponseEntity<byte[]> getImageByUserId(@PathVariable Long id){
-        User user = userService.getUserById(id);
-        byte[] imageFile = user.getImageData(); // --> Not Optional<User> = user.getImageData()
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(user.getImageType()))
-                .body(imageFile);
+        try{
+            User user = userService.getUserById(id);
+            byte[] imageFile = user.getImageData(); // --> Not Optional<User> = user.getImageData()
+            return ResponseEntity.ok()
+                    .contentType(MediaType.valueOf(user.getImageType()))
+                    .body(imageFile);
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @PatchMapping("/{id}/patchData")
@@ -137,8 +150,12 @@ public class UserController{
         String username = authentication.getName();
         User loggedInUser = userService.getUserByUsername(username);
         if(loggedInUser != null){
-            User updatedUser = userService.patchUserInfo(id, user);
-            return ResponseEntity.ok().body(updatedUser);
+            try {
+                User updatedUser = userService.patchUserInfo(id, user);
+                return ResponseEntity.ok().body(updatedUser);
+            } catch (Exception e){
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -149,8 +166,12 @@ public class UserController{
         String username = authentication.getName();
         User loggedInUser = userService.getUserByUsername(username);
         if(loggedInUser != null) {
-            User updatedUser = userService.updateUserInfo(id, user);
-            return ResponseEntity.ok().body(updatedUser);
+            try{
+                User updatedUser = userService.updateUserInfo(id, user);
+                return ResponseEntity.ok().body(updatedUser);
+            } catch (Exception e){
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -161,7 +182,11 @@ public class UserController{
         String username = authentication.getName();
         User loggedInUser = userService.getUserByUsername(username);
         if(loggedInUser != null) {
-            userService.deleteUser(id);
+            try{
+                userService.deleteUser(id);
+            } catch (Exception e){
+                throw new RuntimeException("User not found!", e);
+            }
         }
     }
 
@@ -171,8 +196,12 @@ public class UserController{
         String username = authentication.getName();
         User loggedInUser = userService.getUserByUsername(username);
         if(loggedInUser != null) {
-            User userByUsername = userService.getUserByUsername(userUsername);
-            return new ResponseEntity<>(userByUsername, HttpStatus.OK);
+            try{
+                User userByUsername = userService.getUserByUsername(userUsername);
+                return new ResponseEntity<>(userByUsername, HttpStatus.OK);
+            } catch (Exception e){
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
