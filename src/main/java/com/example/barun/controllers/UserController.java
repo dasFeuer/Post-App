@@ -6,6 +6,7 @@ import com.example.barun.entities.userEntities.User;
 import com.example.barun.services.JwtService;
 import com.example.barun.services.UserDetailsServiceImplementation;
 import com.example.barun.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,8 +36,18 @@ public class UserController{
     @Autowired
     private UserDetailsServiceImplementation userDetailsServiceImplementation;
 
+    private User getAuthenticatedUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        return userService.getUserByUsername(username);
+    }
+
+    private ResponseEntity<String> unauthorized(){
+        return new ResponseEntity<>("Unauthorized access", HttpStatus.UNAUTHORIZED);
+    }
+
     @PostMapping("/register")
-    private ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto){
+    private ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto registerUserDto){
         User newUser = userService.registerTheUser(registerUserDto);
         System.out.println("User registered!");
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
@@ -55,85 +66,98 @@ public class UserController{
 //    }
 
     @PostMapping("/login") // --> For this: Service/ Business logic needed (UserService.java)
-    private ResponseEntity<String> login(@RequestBody LoginUserDto loginUserDto){
-        String user = userService.verifyTheUser(loginUserDto);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(user);
+    private ResponseEntity<String> login(@Valid @RequestBody LoginUserDto loginUserDto){
+        String userJwt = userService.verifyTheUser(loginUserDto);
+        if ("Fail!".equals(userJwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed!");
+        }
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userJwt);
     }
 
     @GetMapping("/allUsers")
     private ResponseEntity<List<User>> getAllUsers(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         try{
-            if(loggedInUser != null) {
-                List<User> allUsers = userService.getAllUsers();
-                return ResponseEntity.ok(allUsers);
-            }
-        } catch (Exception e){
+           List<User> allUsers = userService.getAllUsers();
+            return ResponseEntity.ok(allUsers);
+        }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/{id}")
     private ResponseEntity<User> getUserById(@PathVariable Long id){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
-        if(loggedInUser != null) {
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
             try{
                 User user = userService.getUserById(id);
-                if(user != null){
-                    return new ResponseEntity<>(user, HttpStatus.FOUND);
-                } else {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
+                // Ternary operator-> conditions ? valueIfTure : valueIfFalse --> Can be used to handling the null check
+                return user != null
+                        ? ResponseEntity.ok(user)
+                        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//                if(user != null){
+//                    return new ResponseEntity<>(user, HttpStatus.FOUND);
+//                } else {
+//                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//                }
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+
 
     @PostMapping("/{id}/addImage")
-    private ResponseEntity<?> addUserImage(@PathVariable("id") Long userId,
+    public ResponseEntity<?> addUserImage(@PathVariable("id") Long userId,
                                            @RequestPart("file")MultipartFile multipartFile) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
-        if (loggedInUser != null) {
-            try {
-                User theUser = userService.addImage(userId, multipartFile);
-                return new ResponseEntity<>(theUser, HttpStatus.CREATED);
-            } catch (Exception exception) {
-                return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null) {
+            return unauthorized();
+        }
+
+        if(!loggedInUser.getId().equals(userId)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        try {
+            User theUser = userService.addImage(userId, multipartFile);
+            return ResponseEntity.status(HttpStatus.CREATED).body(theUser);
+        } catch (IOException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
             }
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
 
     @PutMapping("/{id}/updateImage")
     private ResponseEntity<?> updateImage(@PathVariable("id") Long userId,
                                            @RequestPart("file")MultipartFile multipartFile) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
-        if (loggedInUser != null) {
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if(!loggedInUser.getId().equals(userId)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
             try {
                 User theUser = userService.updateImage(userId, multipartFile);
-                return new ResponseEntity<>(theUser, HttpStatus.ACCEPTED);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(theUser);
             } catch (Exception exception){
-                return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
             }
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/{id}/image")
-    private ResponseEntity<byte[]> getImageByUserId(@PathVariable Long id){
+    public ResponseEntity<byte[]> getImageByUserId(@PathVariable Long id){
         try{
             User user = userService.getUserById(id);
+            if(user == null || user.getImageData() == null){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
             byte[] imageFile = user.getImageData(); // --> Not Optional<User> = user.getImageData()
             return ResponseEntity.ok()
                     .contentType(MediaType.valueOf(user.getImageType()))
@@ -145,27 +169,33 @@ public class UserController{
     }
 
     @PatchMapping("/{id}/patchData")
-    private ResponseEntity<User> patchUserData(@PathVariable Long id, @RequestBody User user) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
-        if(loggedInUser != null){
-            try {
+    public ResponseEntity<User> patchUserData(@PathVariable Long id, @RequestBody User user) throws IOException {
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if(!loggedInUser.getId().equals(id)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        try {
                 User updatedUser = userService.patchUserInfo(id, user);
                 return ResponseEntity.ok().body(updatedUser);
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PutMapping("/{id}/updateData")
-    private ResponseEntity<User> updateData(@PathVariable Long id, @RequestBody User user) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
-        if(loggedInUser != null) {
+    public ResponseEntity<User> updateData(@PathVariable Long id, @RequestBody User user) throws IOException {
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        if(!loggedInUser.getId().equals(id)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
             try{
                 User updatedUser = userService.updateUserInfo(id, user);
                 return ResponseEntity.ok().body(updatedUser);
@@ -173,36 +203,40 @@ public class UserController{
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
 
     @DeleteMapping("/{id}/deleteUser")
-    public void deleteUser(@PathVariable Long id){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
-        if(loggedInUser != null) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if(!loggedInUser.getId().equals(id)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
             try{
                 userService.deleteUser(id);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } catch (Exception e){
-                throw new RuntimeException("User not found!", e);
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
     }
 
     @GetMapping("/{userUsername}/username")
     public ResponseEntity<User> getByUsername(@PathVariable String userUsername){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
-        if(loggedInUser != null) {
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
             try{
                 User userByUsername = userService.getUserByUsername(userUsername);
-                return new ResponseEntity<>(userByUsername, HttpStatus.OK);
+//                return new ResponseEntity<>(userByUsername, HttpStatus.OK);
+                return userByUsername != null
+                        ? ResponseEntity.ok(userByUsername)
+                        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
 }

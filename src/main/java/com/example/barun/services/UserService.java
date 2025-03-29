@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,20 +75,8 @@ public class UserService {
         }
     }
 
-    public User addImage(Long userId, MultipartFile imageFile) throws IOException {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if(optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            user.setImageData(imageFile.getBytes());
-            user.setImageType(imageFile.getContentType());
-            user.setImageName(imageFile.getOriginalFilename());
-            return userRepository.save(user);
-        }else {
-            throw new IOException("User not found!");
-        }
-    }
 
-    public User updateImage(Long userId, MultipartFile imageFile) throws IOException {
+    public User updateOrAddTheImage(Long userId, MultipartFile imageFile) throws IOException {
         Optional<User> optionalUser = userRepository.findById(userId);
         if(optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -100,6 +87,14 @@ public class UserService {
         } else {
             throw new IOException("User not found!");
         }
+    }
+
+    public User updateImage(Long userId, MultipartFile imageFile) throws IOException {
+        return updateOrAddTheImage(userId, imageFile);
+    }
+
+    public User addImage(Long userId, MultipartFile imageFile) throws IOException {
+        return updateOrAddTheImage(userId, imageFile);
     }
 
     public User getUserById(Long id) {
