@@ -56,7 +56,7 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
-    public Post addImage(Long postId, MultipartFile multipartFile) throws IOException {
+    public Post updateOrAddTheImage(Long postId, MultipartFile multipartFile) throws IOException {
         Optional<Post> post = postRepository.findById(postId);
         if (post.isPresent()) {
             Post updatePost = post.get();
@@ -70,16 +70,11 @@ public class PostService {
     }
 
     public Post updateImage(Long postId, MultipartFile multipartFile) throws IOException {
-        Optional<Post> post = postRepository.findById(postId);
-        if (post.isPresent()) {
-            Post updatePost = post.get();
-            updatePost.setPostImageData(multipartFile.getBytes());
-            updatePost.setPostImageType(multipartFile.getContentType());
-            updatePost.setPostImageName(multipartFile.getOriginalFilename());
-            return postRepository.save(updatePost);
-        } else {
-            throw new IOException("Post not found!");
-        }
+        return updateOrAddTheImage(postId, multipartFile);
+    }
+
+    public Post addImage(Long postId, MultipartFile multipartFile) throws IOException {
+        return updateOrAddTheImage(postId, multipartFile);
     }
 
 

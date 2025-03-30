@@ -28,6 +28,21 @@ public class PostControllers {
     @Autowired
     private UserService userService;
 
+    private boolean isPostOwnedByUser(Long postId, User user){
+        Optional<Post> post = postService.getPostById(postId);
+        return post.isPresent() && post.get().getAuthor().getId().equals(user.getId());
+    }
+
+    private User getAuthenticatedUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        return userService.getUserByUsername(username);
+    }
+
+    private ResponseEntity<String> unauthorizedUser(){
+        return new ResponseEntity<>("Unauthorized access", HttpStatus.UNAUTHORIZED);
+    }
+
     @PostMapping("/createPost")
     public ResponseEntity<Post> create(@RequestBody PostRequestDto postRequestDto){
         Post createdPost = postService.createPostByUser(postRequestDto);
@@ -36,14 +51,25 @@ public class PostControllers {
 
     @GetMapping("/{id}/post")
     public ResponseEntity<?>findPostById(@PathVariable Long id){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
-        List<Post> post = loggedInUser.getPosts();
-        if(!post.isEmpty()){
-            Optional<Post> postById = postService.getPostById(id);
-            if(postById.isPresent()){
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+//        List<Post> post = loggedInUser.getPosts();
+//        if(!post.isEmpty()){
+//            Optional<Post> postById = postService.getPostById(id);
+//            if(postById.isPresent()){
+//                return ResponseEntity.ok(postById.get());
+//            }
+//        }
+//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Optional<Post> postById = postService.getPostById(id);
+        if(postById.isPresent()){
+            if (isPostOwnedByUser(id, loggedInUser)){
                 return ResponseEntity.ok(postById.get());
+            } else {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -56,34 +82,54 @@ public class PostControllers {
 
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<?> deletePostById(@PathVariable Long id){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
-        List<Post> posts = loggedInUser.getPosts();
-        postService.deletePostById(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(posts);
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+//        List<Post> posts = loggedInUser.getPosts();
+//        postService.deletePostById(id);
+//        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(posts);
+        if (isPostOwnedByUser(id, loggedInUser)){
+            postService.deletePostById(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @PostMapping("/{postId}/post")
-    public ResponseEntity<Post> addImage(@PathVariable Long postId,
+    public ResponseEntity<?> addImage(@PathVariable Long postId,
                                          @RequestPart("file")MultipartFile multipartFile)
             throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
-        List<Post> post = loggedInUser.getPosts();
-        if(!post.isEmpty()){
-            Post addedImagePost = postService.addImage(postId, multipartFile);
-            return new ResponseEntity<>(addedImagePost, HttpStatus.ACCEPTED);
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null){
+            return unauthorizedUser();
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        List<Post> post = loggedInUser.getPosts();
+//        if(!post.isEmpty()){
+//            Post addedImagePost = postService.addImage(postId, multipartFile);
+//            return new ResponseEntity<>(addedImagePost, HttpStatus.ACCEPTED);
+//        }
+//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Optional<Post> postById = postService.getPostById(postId);
+        if(postById.isPresent()){
+            if(isPostOwnedByUser(postId, loggedInUser)){
+                Post post = postService.addImage(postId, multipartFile);
+                return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+            } else {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    // Todo --> Modify the code with helper function for authentication
 
     @GetMapping("/{postId}/image")
     public ResponseEntity<byte[]> getImageByPostId(@PathVariable Long postId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null || loggedInUser.getImageData() == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         List<Post> postOfLoginUser = loggedInUser.getPosts();
         if (!postOfLoginUser.isEmpty()) {
             Optional<Post> post = postService.getPostById(postId);
@@ -103,9 +149,10 @@ public class PostControllers {
             @PathVariable Long postId,
             @RequestPart("file") MultipartFile multipartFile)
             throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         List<Post> postImageOfLoginUser = loggedInUser.getPosts();
 
         if(!postImageOfLoginUser.isEmpty()){
@@ -120,9 +167,10 @@ public class PostControllers {
             @PathVariable Long postId,
             @RequestBody PostRequestDto postRequestDto)
             throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         List<Post> postOfLoginUser = loggedInUser.getPosts();
 
         if(!postOfLoginUser.isEmpty()){
@@ -137,9 +185,10 @@ public class PostControllers {
             @PathVariable Long postId,
             @RequestBody PostRequestDto postRequestDto)
             throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         List<Post> postOfLoginUser = loggedInUser.getPosts();
 
         if(!postOfLoginUser.isEmpty()){
