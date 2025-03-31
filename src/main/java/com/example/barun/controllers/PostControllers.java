@@ -132,7 +132,7 @@ public class PostControllers {
     @GetMapping("/{postId}/image")
     public ResponseEntity<byte[]> getImageByPostId(@PathVariable Long postId) {
         User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null || loggedInUser.getImageData() == null){
+        if(loggedInUser == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 //        List<Post> postOfLoginUser = loggedInUser.getPosts();
