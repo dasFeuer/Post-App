@@ -89,11 +89,16 @@ public class PostControllers {
 //        List<Post> posts = loggedInUser.getPosts();
 //        postService.deletePostById(id);
 //        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(posts);
-        if (isPostOwnedByUser(id, loggedInUser)){
-            postService.deletePostById(id);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        Optional<Post> postById = postService.getPostById(id);
+        if(postById.isPresent()){
+            if (isPostOwnedByUser(id, loggedInUser)){
+                postService.deletePostById(id);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            } else {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
         }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/{postId}/post")
@@ -130,18 +135,31 @@ public class PostControllers {
         if(loggedInUser == null || loggedInUser.getImageData() == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        List<Post> postOfLoginUser = loggedInUser.getPosts();
-        if (!postOfLoginUser.isEmpty()) {
-            Optional<Post> post = postService.getPostById(postId);
-            if (post.isPresent()) {
-                byte[] postImageFile = post.get().getPostImageData(); // --> Yes Optional<Post> = post.get().getImageData()
+//        List<Post> postOfLoginUser = loggedInUser.getPosts();
+//        if (!postOfLoginUser.isEmpty()) {
+//            Optional<Post> post = postService.getPostById(postId);
+//            if (post.isPresent()) {
+//                byte[] postImageFile = post.get().getPostImageData(); // --> Yes Optional<Post> = post.get().getImageData()
+//                return ResponseEntity.ok()
+//                        .contentType(MediaType.valueOf(post.get().getPostImageType()))
+//                        .body(postImageFile);
+//            }
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Optional<Post> post = postService.getPostById(postId);
+        if(post.isPresent()){
+            if(isPostOwnedByUser(postId, loggedInUser)){
+                byte[] postImageFile = post.get().getPostImageData(); //--> Yes Optional<Post> = post.get().getImageData()
                 return ResponseEntity.ok()
                         .contentType(MediaType.valueOf(post.get().getPostImageType()))
                         .body(postImageFile);
+            } else {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PutMapping("{postId}/updatePostImage")
@@ -153,13 +171,24 @@ public class PostControllers {
         if(loggedInUser == null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        List<Post> postImageOfLoginUser = loggedInUser.getPosts();
-
-        if(!postImageOfLoginUser.isEmpty()){
-            Post post = postService.updateImage(postId, multipartFile);
-            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+//        List<Post> postImageOfLoginUser = loggedInUser.getPosts();
+//
+//        if(!postImageOfLoginUser.isEmpty()){
+//            Post post = postService.updateImage(postId, multipartFile);
+//            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+//        }
+//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Optional<Post> postById = postService.getPostById(postId);
+        if(postById.isPresent()){
+            if(isPostOwnedByUser(postId, loggedInUser)){
+                Post post = postService.updateImage(postId, multipartFile);
+                return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+            } else {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
     }
 
     @PutMapping("{postId}/updatePost")
@@ -171,13 +200,24 @@ public class PostControllers {
         if(loggedInUser == null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        List<Post> postOfLoginUser = loggedInUser.getPosts();
+//        List<Post> postOfLoginUser = loggedInUser.getPosts();
+//
+//        if(!postOfLoginUser.isEmpty()){
+//            Post post = postService.updatePost(postId, postRequestDto);
+//            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+//        }
+//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        if(!postOfLoginUser.isEmpty()){
-            Post post = postService.updatePost(postId, postRequestDto);
-            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+        Optional<Post> postById = postService.getPostById(postId);
+        if(postById.isPresent()){
+            if(isPostOwnedByUser(postId, loggedInUser)){
+                Post post = postService.updatePost(postId, postRequestDto);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(post);
+            } else {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PatchMapping("{postId}/patchPost")
@@ -186,15 +226,26 @@ public class PostControllers {
             @RequestBody PostRequestDto postRequestDto)
             throws Exception {
         User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null){
+        if (loggedInUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        List<Post> postOfLoginUser = loggedInUser.getPosts();
-
-        if(!postOfLoginUser.isEmpty()){
-            Post post = postService.patchPost(postId, postRequestDto);
-            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+//        List<Post> postOfLoginUser = loggedInUser.getPosts();
+//
+//        if(!postOfLoginUser.isEmpty()){
+//            Post post = postService.patchPost(postId, postRequestDto);
+//            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+//        }
+//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//    }
+        Optional<Post> postById = postService.getPostById(postId);
+        if (postById.isPresent()) {
+            if (isPostOwnedByUser(postId, loggedInUser)) {
+                Post post = postService.patchPost(postId, postRequestDto);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(post);
+            } else {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
