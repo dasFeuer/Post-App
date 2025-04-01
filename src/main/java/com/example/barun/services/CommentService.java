@@ -40,8 +40,9 @@ public class CommentService {
             newComment.setPost(thepost);
             newComment.setAuthor(existingUser);
             return commentRepository.save(newComment);
+        } else {
+            throw new IOException("Post not found!");
         }
-        throw new IOException("Post not found!");
     }
 
     public Optional<Comments> getCommentsById(Long commentId){
@@ -49,12 +50,14 @@ public class CommentService {
     }
 
     public void deleteCommentById(Long commentId){
-        commentRepository.deleteById(commentId);
+        if(commentRepository.existsById(commentId)){
+            commentRepository.deleteById(commentId);
+        }
     }
 
-    public void deleteAllComments(){
-        commentRepository.deleteAll();
-    }
+//    public void deleteAllComments(){
+//        commentRepository.deleteAll();
+//    }
 
     public Comments updateComments(Long commentId, CommentDto commentDto){
         Optional<Comments> existingComment = commentRepository.findById(commentId);

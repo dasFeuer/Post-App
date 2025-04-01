@@ -55,14 +55,6 @@ public class PostControllers {
         if(loggedInUser == null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-//        List<Post> post = loggedInUser.getPosts();
-//        if(!post.isEmpty()){
-//            Optional<Post> postById = postService.getPostById(id);
-//            if(postById.isPresent()){
-//                return ResponseEntity.ok(postById.get());
-//            }
-//        }
-//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Optional<Post> postById = postService.getPostById(id);
         if(postById.isPresent()){
@@ -109,12 +101,6 @@ public class PostControllers {
         if(loggedInUser == null){
             return unauthorizedUser();
         }
-//        List<Post> post = loggedInUser.getPosts();
-//        if(!post.isEmpty()){
-//            Post addedImagePost = postService.addImage(postId, multipartFile);
-//            return new ResponseEntity<>(addedImagePost, HttpStatus.ACCEPTED);
-//        }
-//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Optional<Post> postById = postService.getPostById(postId);
         if(postById.isPresent()){
             if(isPostOwnedByUser(postId, loggedInUser)){
@@ -127,26 +113,12 @@ public class PostControllers {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    // Todo --> Modify the code with helper function for authentication
-
     @GetMapping("/{postId}/image")
     public ResponseEntity<byte[]> getImageByPostId(@PathVariable Long postId) {
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-//        List<Post> postOfLoginUser = loggedInUser.getPosts();
-//        if (!postOfLoginUser.isEmpty()) {
-//            Optional<Post> post = postService.getPostById(postId);
-//            if (post.isPresent()) {
-//                byte[] postImageFile = post.get().getPostImageData(); // --> Yes Optional<Post> = post.get().getImageData()
-//                return ResponseEntity.ok()
-//                        .contentType(MediaType.valueOf(post.get().getPostImageType()))
-//                        .body(postImageFile);
-//            }
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<Post> post = postService.getPostById(postId);
         if(post.isPresent()){
@@ -171,13 +143,7 @@ public class PostControllers {
         if(loggedInUser == null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-//        List<Post> postImageOfLoginUser = loggedInUser.getPosts();
-//
-//        if(!postImageOfLoginUser.isEmpty()){
-//            Post post = postService.updateImage(postId, multipartFile);
-//            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
-//        }
-//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
         Optional<Post> postById = postService.getPostById(postId);
         if(postById.isPresent()){
             if(isPostOwnedByUser(postId, loggedInUser)){
@@ -200,13 +166,6 @@ public class PostControllers {
         if(loggedInUser == null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-//        List<Post> postOfLoginUser = loggedInUser.getPosts();
-//
-//        if(!postOfLoginUser.isEmpty()){
-//            Post post = postService.updatePost(postId, postRequestDto);
-//            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
-//        }
-//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<Post> postById = postService.getPostById(postId);
         if(postById.isPresent()){
@@ -229,14 +188,7 @@ public class PostControllers {
         if (loggedInUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-//        List<Post> postOfLoginUser = loggedInUser.getPosts();
-//
-//        if(!postOfLoginUser.isEmpty()){
-//            Post post = postService.patchPost(postId, postRequestDto);
-//            return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
-//        }
-//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//    }
+
         Optional<Post> postById = postService.getPostById(postId);
         if (postById.isPresent()) {
             if (isPostOwnedByUser(postId, loggedInUser)) {
