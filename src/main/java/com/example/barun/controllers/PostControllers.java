@@ -51,25 +51,35 @@ public class PostControllers {
 
     @GetMapping("/{id}/post")
     public ResponseEntity<?>findPostById(@PathVariable Long id){
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
+//        User loggedInUser = getAuthenticatedUser();
+//        if(loggedInUser == null){
+//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//        }
+//
+//        Optional<Post> postById = postService.getPostById(id);
+//        if(postById.isPresent()){
+//            if (isPostOwnedByUser(id, loggedInUser)){
+//                return ResponseEntity.ok(postById.get());
+//            } else {
+//                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//            }
+//        }
+//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Optional<Post> postById = postService.getPostById(id);
-        if(postById.isPresent()){
-            if (isPostOwnedByUser(id, loggedInUser)){
-                return ResponseEntity.ok(postById.get());
-            } else {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-            }
+        Optional<Post> posts = postService.getPostById(id);
+        if(posts.isEmpty()){
+            return new ResponseEntity<>("Post not found", HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return ResponseEntity.ok(posts.get());
     }
 
     @GetMapping("/getAllPosts")
-    public List<Post> findAllPost(){
-        return postService.getAllPosts();
+    public ResponseEntity<?> findAllPost(){
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null){
+            return unauthorizedUser();
+        }
+        return ResponseEntity.ok(postService.getAllPosts());
     }
 
     @DeleteMapping("/{id}/delete")

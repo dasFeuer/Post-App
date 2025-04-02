@@ -72,4 +72,11 @@ public class CommentService {
     public List<Comments> findAllComments() {
         return commentRepository.findAll();
     }
+
+    public List<Comments> getCommentsByPostId(Long postId){
+        if(postService.getPostById(postId).isEmpty()){
+            throw new RuntimeException("Post not found");
+        }
+        return commentRepository.findCommentsByPostId(postId);
+    }
 }

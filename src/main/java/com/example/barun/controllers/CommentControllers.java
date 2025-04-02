@@ -2,6 +2,7 @@ package com.example.barun.controllers;
 
 import com.example.barun.dto.CommentDto;
 import com.example.barun.entities.commentEntities.Comments;
+import com.example.barun.entities.postEntities.Post;
 import com.example.barun.entities.userEntities.User;
 import com.example.barun.services.CommentService;
 import com.example.barun.services.PostService;
@@ -14,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -129,5 +131,12 @@ public class CommentControllers {
             return unauthorizedUser();
         }
          return ResponseEntity.ok(commentService.findAllComments());
+    }
+
+    @GetMapping("/{postId}/postComments")
+    public ResponseEntity<?> getCommentsByPostId(@PathVariable Long postId){
+        List<Comments> comments = commentService.getCommentsByPostId(postId);
+        return ResponseEntity.ok(comments);
+
     }
 }
