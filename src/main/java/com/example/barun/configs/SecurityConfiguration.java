@@ -32,7 +32,12 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/", "/users/**", "/posts/**", "/postComments/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/users/**",
+                                "/posts/**",
+                                "/postComments/**",
+                                "/contactForm/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
