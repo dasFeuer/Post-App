@@ -7,6 +7,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ContactFormService {
     @Autowired
@@ -27,6 +29,14 @@ public class ContactFormService {
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
+    }
+
+    public List<ContactForm> getAllContactForm(){
+        return contactFormRepository.findAll();
+    }
+
+    public void deleteAllContactForm(){
+        contactFormRepository.deleteAll();
     }
 
 }
