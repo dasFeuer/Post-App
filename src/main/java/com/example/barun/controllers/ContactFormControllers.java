@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/contactForm")
@@ -17,13 +18,12 @@ public class ContactFormControllers {
     @Autowired
     private ContactFormService formService;
 
-    @Value("${contactFrom.recipient.email}")
+    @Value("${contactForm.recipient.email}")
     private String recipientEmail;
 
     @PostMapping("/sendForm")
     public String sendContactForm(@RequestBody ContactForm contactForm){
-        String name = "Developer Barun";
-        String subject = "You got a new Contact from! " + name;
+        String subject = "You got a new message from: " + contactForm.getFullName();
         String body = "Name: " + contactForm.getFullName() + "\n" +
                       "Email: " + contactForm.getEmail() + "\n" +
                       "Message: " + contactForm.getMessage();
@@ -40,6 +40,18 @@ public class ContactFormControllers {
     @DeleteMapping("/deleteAllForms")
     public ResponseEntity<Void> deleteAllTheForms(){
         formService.deleteAllContactForm();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/{id}/form")
+    public ResponseEntity<ContactForm> findById(@PathVariable Long id){
+        Optional<ContactForm> byId = formService.getById(id);
+        return byId.map(ResponseEntity::ok)
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id){
+        formService.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

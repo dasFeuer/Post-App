@@ -2,12 +2,14 @@ package com.example.barun.services;
 
 import com.example.barun.entities.contactFormEntities.ContactForm;
 import com.example.barun.repositories.ContactFormRepository;
+import jakarta.persistence.Lob;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContactFormService {
@@ -17,7 +19,8 @@ public class ContactFormService {
     @Autowired
     private ContactFormRepository contactFormRepository;
 
-    public void sendEmailOfContactForm(String to, String subject, String body, ContactForm contactForm){
+    public void sendEmailOfContactForm(
+            String to, String subject, String body, ContactForm contactForm){
         try{
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(to);
@@ -39,4 +42,11 @@ public class ContactFormService {
         contactFormRepository.deleteAll();
     }
 
+    public Optional<ContactForm> getById(Long id){
+        return contactFormRepository.findById(id);
+    }
+
+    public void deleteById(Long id){
+        contactFormRepository.deleteById(id);
+    }
 }
