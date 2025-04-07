@@ -2,7 +2,6 @@ package com.example.barun.services;
 
 import com.example.barun.entities.contactFormEntities.ContactForm;
 import com.example.barun.repositories.ContactFormRepository;
-import jakarta.persistence.Lob;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
