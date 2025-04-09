@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PostServiceTest {
+public class PostControllersTest {
 
     @InjectMocks
     private PostControllers postControllers;
@@ -44,5 +44,6 @@ public class PostServiceTest {
         assertEquals(mockPost, responseEntity.getBody());
 
         System.out.println("Test Passed");
+
     }
 }
