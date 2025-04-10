@@ -10,6 +10,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "postReaction")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PostLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
