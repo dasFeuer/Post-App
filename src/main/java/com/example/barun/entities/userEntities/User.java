@@ -2,6 +2,7 @@ package com.example.barun.entities.userEntities;
 
 import com.example.barun.entities.commentEntities.Comments;
 import com.example.barun.entities.postEntities.Post;
+import com.example.barun.entities.reactionEntities.PostLike;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -64,6 +65,10 @@ public class User {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"author", "post"})
     private List<Comments> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"user", "post"})
+    private List<PostLike> likes = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)
@@ -159,5 +164,21 @@ public class User {
 
     public void setPosts(List<Post> posts) {
         this.posts = posts;
+    }
+
+    public List<Comments> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comments> comments) {
+        this.comments = comments;
+    }
+
+    public List<PostLike> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<PostLike> likes) {
+        this.likes = likes;
     }
 }

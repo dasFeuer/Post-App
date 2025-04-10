@@ -1,9 +1,11 @@
 package com.example.barun.entities.postEntities;
 
 import com.example.barun.entities.commentEntities.Comments;
+import com.example.barun.entities.reactionEntities.PostLike;
 import com.example.barun.entities.userEntities.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -47,6 +49,10 @@ public class Post {
     @JsonIgnoreProperties({"post", "author"})
     private List<Comments> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"post", "user"})
+    private List<PostLike> likes = new ArrayList<>();
+
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)
     private Date createdAt;
@@ -55,6 +61,10 @@ public class Post {
     @Column(name = "updatedAt")
     private Date updatedAt;
 
+    @JsonProperty("likeCount")
+    public int getLikeCount() {
+        return likes.size();
+    }
 
     public Long getId() {
         return id;
@@ -134,5 +144,13 @@ public class Post {
 
     public void setComments(List<Comments> comments) {
         this.comments = comments;
+    }
+
+    public List<PostLike> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<PostLike> likes) {
+        this.likes = likes;
     }
 }
