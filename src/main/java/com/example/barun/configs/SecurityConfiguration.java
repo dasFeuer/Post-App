@@ -37,7 +37,8 @@ public class SecurityConfiguration {
                                 "/users/**",
                                 "/posts/**",
                                 "/postComments/**",
-                                "/contactForm/**").permitAll()
+                                "/contactForm/**",
+                                "/likes/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
