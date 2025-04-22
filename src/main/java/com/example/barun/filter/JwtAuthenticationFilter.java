@@ -1,7 +1,7 @@
 package com.example.barun.filter;
 
-import com.example.barun.services.JwtService;
-import com.example.barun.services.UserDetailsServiceImplementation;
+import com.example.barun.services.impl.JwtService;
+import com.example.barun.services.impl.UserDetailsServiceImplementation;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package com.example.barun.entities.contactFormEntities;
+package com.example.barun.domain.entities;
 
 import jakarta.persistence.*;
 

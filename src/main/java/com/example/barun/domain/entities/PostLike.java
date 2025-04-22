@@ -1,7 +1,5 @@
-package com.example.barun.entities.reactionEntities;
+package com.example.barun.domain.entities;
 
-import com.example.barun.entities.postEntities.Post;
-import com.example.barun.entities.userEntities.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;

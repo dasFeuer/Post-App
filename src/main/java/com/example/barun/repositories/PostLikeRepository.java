@@ -1,6 +1,6 @@
 package com.example.barun.repositories;
 
-import com.example.barun.entities.reactionEntities.PostLike;
+import com.example.barun.domain.entities.PostLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

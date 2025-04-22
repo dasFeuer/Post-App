@@ -1,6 +1,6 @@
 package com.example.barun.repositories;
 
-import com.example.barun.entities.contactFormEntities.ContactForm;
+import com.example.barun.domain.entities.ContactForm;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

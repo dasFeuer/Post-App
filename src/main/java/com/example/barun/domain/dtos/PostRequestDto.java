@@ -1,4 +1,4 @@
-package com.example.barun.dto;
+package com.example.barun.domain.dtos;
 
 public class PostRequestDto {
     private String title;

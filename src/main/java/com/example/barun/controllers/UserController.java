@@ -1,11 +1,11 @@
 package com.example.barun.controllers;
 
-import com.example.barun.dto.LoginUserDto;
-import com.example.barun.dto.RegisterUserDto;
-import com.example.barun.entities.userEntities.User;
-import com.example.barun.services.JwtService;
-import com.example.barun.services.UserDetailsServiceImplementation;
-import com.example.barun.services.UserService;
+import com.example.barun.domain.dtos.LoginUserDto;
+import com.example.barun.domain.dtos.RegisterUserDto;
+import com.example.barun.domain.entities.User;
+import com.example.barun.services.impl.JwtService;
+import com.example.barun.services.impl.UserDetailsServiceImplementation;
+import com.example.barun.services.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +25,7 @@ import java.util.List;
 public class UserController{
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private JwtService jwtService;
@@ -39,7 +39,7 @@ public class UserController{
     private User getAuthenticatedUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        return userService.getUserByUsername(username);
+        return userServiceImpl.getUserByUsername(username);
     }
 
     private ResponseEntity<String> unauthorized(){
@@ -48,7 +48,7 @@ public class UserController{
 
     @PostMapping("/register")
     private ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto registerUserDto){
-        User newUser = userService.registerTheUser(registerUserDto);
+        User newUser = userServiceImpl.registerTheUser(registerUserDto);
         System.out.println("User registered!");
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
@@ -65,9 +65,9 @@ public class UserController{
 //        return ResponseEntity.status(HttpStatus.ACCEPTED).body(jwt);
 //    }
 
-    @PostMapping("/login") // --> For this: Service/ Business logic needed (UserService.java)
+    @PostMapping("/login") // --> For this: Service/ Business logic needed (UserServiceImpl.java)
     private ResponseEntity<String> login(@Valid @RequestBody LoginUserDto loginUserDto){
-        String userJwt = userService.verifyTheUser(loginUserDto);
+        String userJwt = userServiceImpl.verifyTheUser(loginUserDto);
         if ("Fail!".equals(userJwt)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed!");
         }
@@ -81,7 +81,7 @@ public class UserController{
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         try{
-           List<User> allUsers = userService.getAllUsers();
+           List<User> allUsers = userServiceImpl.getAllUsers();
             return ResponseEntity.ok(allUsers);
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -95,7 +95,7 @@ public class UserController{
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
             try{
-                User user = userService.getUserById(id);
+                User user = userServiceImpl.getUserById(id);
                 // Ternary operator-> conditions ? valueIfTure : valueIfFalse --> Can be used to handling the null check
                 return user != null
                         ? ResponseEntity.ok(user)
@@ -124,7 +124,7 @@ public class UserController{
         }
 
         try {
-            User theUser = userService.addImage(userId, multipartFile);
+            User theUser = userServiceImpl.addImage(userId, multipartFile);
             return ResponseEntity.status(HttpStatus.CREATED).body(theUser);
         } catch (IOException exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
@@ -144,7 +144,7 @@ public class UserController{
         }
 
             try {
-                User theUser = userService.updateImage(userId, multipartFile);
+                User theUser = userServiceImpl.updateImage(userId, multipartFile);
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(theUser);
             } catch (Exception exception){
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
@@ -154,7 +154,7 @@ public class UserController{
     @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getImageByUserId(@PathVariable Long id){
         try{
-            User user = userService.getUserById(id);
+            User user = userServiceImpl.getUserById(id);
             if(user == null || user.getImageData() == null){
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -180,7 +180,7 @@ public class UserController{
         }
 
         try {
-                User updatedUser = userService.patchUserInfo(id, user);
+                User updatedUser = userServiceImpl.patchUserInfo(id, user);
                 return ResponseEntity.ok().body(updatedUser);
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -197,7 +197,7 @@ public class UserController{
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
             try{
-                User updatedUser = userService.updateUserInfo(id, user);
+                User updatedUser = userServiceImpl.updateUserInfo(id, user);
                 return ResponseEntity.ok().body(updatedUser);
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -216,7 +216,7 @@ public class UserController{
         }
 
             try{
-                userService.deleteUser(id);
+                userServiceImpl.deleteUser(id);
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -230,7 +230,7 @@ public class UserController{
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
             try{
-                User userByUsername = userService.getUserByUsername(userUsername);
+                User userByUsername = userServiceImpl.getUserByUsername(userUsername);
 //                return new ResponseEntity<>(userByUsername, HttpStatus.OK);
                 return userByUsername != null
                         ? ResponseEntity.ok(userByUsername)

@@ -1,6 +1,6 @@
 package com.example.barun.repositories;
 
-import com.example.barun.entities.commentEntities.Comments;
+import com.example.barun.domain.entities.Comments;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,9 +1,9 @@
 package com.example.barun;
 
 import com.example.barun.controllers.PostControllers;
-import com.example.barun.dto.PostRequestDto;
-import com.example.barun.entities.postEntities.Post;
-import com.example.barun.services.PostService;
+import com.example.barun.domain.dtos.PostRequestDto;
+import com.example.barun.domain.entities.Post;
+import com.example.barun.services.impl.PostService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

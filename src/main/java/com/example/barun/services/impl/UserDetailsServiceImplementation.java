@@ -1,7 +1,7 @@
-package com.example.barun.services;
+package com.example.barun.services.impl;
 
-import com.example.barun.entities.userEntities.User;
-import com.example.barun.entities.userEntities.UserPrincipal;
+import com.example.barun.domain.entities.User;
+import com.example.barun.domain.entities.UserPrincipal;
 import com.example.barun.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

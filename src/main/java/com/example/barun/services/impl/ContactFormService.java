@@ -1,6 +1,6 @@
-package com.example.barun.services;
+package com.example.barun.services.impl;
 
-import com.example.barun.entities.contactFormEntities.ContactForm;
+import com.example.barun.domain.entities.ContactForm;
 import com.example.barun.repositories.ContactFormRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;

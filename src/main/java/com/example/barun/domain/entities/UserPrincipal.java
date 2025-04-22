@@ -1,4 +1,4 @@
-package com.example.barun.entities.userEntities;
+package com.example.barun.domain.entities;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

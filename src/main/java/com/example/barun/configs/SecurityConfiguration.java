@@ -1,7 +1,7 @@
 package com.example.barun.configs;
 
 import com.example.barun.filter.JwtAuthenticationFilter;
-import com.example.barun.services.UserDetailsServiceImplementation;
+import com.example.barun.services.impl.UserDetailsServiceImplementation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

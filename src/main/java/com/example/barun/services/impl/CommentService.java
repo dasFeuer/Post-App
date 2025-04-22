@@ -1,9 +1,9 @@
-package com.example.barun.services;
+package com.example.barun.services.impl;
 
-import com.example.barun.dto.CommentDto;
-import com.example.barun.entities.commentEntities.Comments;
-import com.example.barun.entities.postEntities.Post;
-import com.example.barun.entities.userEntities.User;
+import com.example.barun.domain.dtos.CommentDto;
+import com.example.barun.domain.entities.Comments;
+import com.example.barun.domain.entities.Post;
+import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.CommentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +24,13 @@ public class CommentService {
     private PostService postService;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Transactional
     public Comments writeCommentOnUserPost(Long postId, CommentDto commentDto) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User existingUser = userService.getUserByUsername(username);
+        User existingUser = userServiceImpl.getUserByUsername(username);
         Optional<Post> existingPost = postService.getPostById(postId);
 
         if(existingPost.isPresent()) {

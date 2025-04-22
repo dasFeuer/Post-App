@@ -1,10 +1,10 @@
 package com.example.barun.controllers;
 
-import com.example.barun.entities.postEntities.Post;
-import com.example.barun.dto.PostRequestDto;
-import com.example.barun.entities.userEntities.User;
-import com.example.barun.services.PostService;
-import com.example.barun.services.UserService;
+import com.example.barun.domain.entities.Post;
+import com.example.barun.domain.dtos.PostRequestDto;
+import com.example.barun.domain.entities.User;
+import com.example.barun.services.impl.PostService;
+import com.example.barun.services.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,7 +25,7 @@ public class PostControllers {
     private PostService postService;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     private boolean isPostOwnedByUser(Long postId, User user){
         Optional<Post> post = postService.getPostById(postId);
@@ -35,7 +35,7 @@ public class PostControllers {
     private User getAuthenticatedUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        return userService.getUserByUsername(username);
+        return userServiceImpl.getUserByUsername(username);
     }
 
     private ResponseEntity<String> unauthorizedUser(){

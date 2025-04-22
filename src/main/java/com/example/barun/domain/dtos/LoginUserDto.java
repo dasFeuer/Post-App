@@ -1,8 +1,7 @@
-package com.example.barun.dto;
+package com.example.barun.domain.dtos;
 
 
 public class LoginUserDto {
-//    private String email;
     private String username;
     private String password;
 
@@ -13,14 +12,6 @@ public class LoginUserDto {
     public void setUsername(String username) {
         this.username = username;
     }
-
-//    public String getEmail() {
-//        return email;
-//    }
-//
-//    public void setEmail(String email) {
-//        this.email = email;
-//    }
 
     public String getPassword() {
         return password;

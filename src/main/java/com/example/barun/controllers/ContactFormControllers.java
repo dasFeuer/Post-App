@@ -1,7 +1,7 @@
 package com.example.barun.controllers;
 
-import com.example.barun.entities.contactFormEntities.ContactForm;
-import com.example.barun.services.ContactFormService;
+import com.example.barun.domain.entities.ContactForm;
+import com.example.barun.services.impl.ContactFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;

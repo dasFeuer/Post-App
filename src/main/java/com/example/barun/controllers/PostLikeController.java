@@ -1,9 +1,9 @@
 package com.example.barun.controllers;
 
-import com.example.barun.dto.LikeResponseDto;
-import com.example.barun.entities.userEntities.User;
-import com.example.barun.services.LikeService;
-import com.example.barun.services.UserService;
+import com.example.barun.domain.dtos.LikeResponseDto;
+import com.example.barun.domain.entities.User;
+import com.example.barun.services.impl.LikeService;
+import com.example.barun.services.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,7 +20,7 @@ public class PostLikeController {
     private LikeService likeService;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @PostMapping("/{postId}/like")
     public ResponseEntity<LikeResponseDto> toggleLike(@PathVariable Long postId){
@@ -46,7 +46,7 @@ public class PostLikeController {
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
-            User currentUser = userService.getUserByUsername(username);
+            User currentUser = userServiceImpl.getUserByUsername(username);
 
             boolean isLiked = likeService.hasUserLikedThePost(currentUser.getId(), postId);
             int likeCount = likeService.getLikeCountForPost(postId);

@@ -1,8 +1,8 @@
-package com.example.barun.services;
+package com.example.barun.services.impl;
 
-import com.example.barun.entities.postEntities.Post;
-import com.example.barun.entities.reactionEntities.PostLike;
-import com.example.barun.entities.userEntities.User;
+import com.example.barun.domain.entities.Post;
+import com.example.barun.domain.entities.PostLike;
+import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.PostLikeRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class LikeService {
     private PostLikeRepository likeRepository;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private PostService postService;
@@ -30,7 +30,7 @@ public class LikeService {
     public boolean toggleLike(Long postId) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
+        User loggedInUser = userServiceImpl.getUserByUsername(username);
 
         if(loggedInUser == null){
             throw new UsernameNotFoundException("User not found with username: " + username);

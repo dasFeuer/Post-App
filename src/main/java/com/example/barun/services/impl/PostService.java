@@ -1,8 +1,8 @@
-package com.example.barun.services;
+package com.example.barun.services.impl;
 
-import com.example.barun.entities.postEntities.Post;
-import com.example.barun.dto.PostRequestDto;
-import com.example.barun.entities.userEntities.User;
+import com.example.barun.domain.entities.Post;
+import com.example.barun.domain.dtos.PostRequestDto;
+import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.PostRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +23,13 @@ public class PostService {
     private PostRepository postRepository;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Transactional
     public Post createPostByUser(PostRequestDto postRequestDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User author = userService.getUserByUsername(username);
+        User author = userServiceImpl.getUserByUsername(username);
         System.out.println("Username: " + username);
 
         if (!username.isEmpty()) {

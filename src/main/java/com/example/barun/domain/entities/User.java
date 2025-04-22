@@ -1,8 +1,5 @@
-package com.example.barun.entities.userEntities;
+package com.example.barun.domain.entities;
 
-import com.example.barun.entities.commentEntities.Comments;
-import com.example.barun.entities.postEntities.Post;
-import com.example.barun.entities.reactionEntities.PostLike;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -77,6 +74,35 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updatedAt")
     private Date updatedAt;
+
+    public User() {}
+
+    public User(Long id, byte[] imageData,
+                String imageType,
+                String imageName,
+                String fullName,
+                String username,
+                String email,
+                String password,
+                List<Post> posts,
+                List<Comments> comments,
+                List<PostLike> likes,
+                Date createdAt,
+                Date updatedAt) {
+        this.id = id;
+        this.imageData = imageData;
+        this.imageType = imageType;
+        this.imageName = imageName;
+        this.fullName = fullName;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.posts = posts;
+        this.comments = comments;
+        this.likes = likes;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
     public Long getId() {
         return id;
