@@ -1,5 +1,6 @@
 package com.example.barun.services.impl;
 
+import com.example.barun.domain.dtos.AuthResponse;
 import com.example.barun.domain.dtos.LoginUserDto;
 import com.example.barun.domain.dtos.RegisterUserDto;
 import com.example.barun.domain.entities.User;
@@ -57,7 +58,12 @@ public class UserServiceImpl implements UserService {
                     loginUserDto.getPassword()
             ));
             if (authentication.isAuthenticated()) {
-                return jwtService.generateToken(loginUserDto.getUsername());
+                String tokenValue = jwtService.generateToken(loginUserDto.getUsername());
+                AuthResponse authResponse = new AuthResponse();
+                authResponse.setToken(tokenValue);
+                authResponse.setExpiresIn(86400);
+                return "Token: " + authResponse.getToken() + "\n" +
+                        "Expires in: " + authResponse.getExpiresIn() + " seconds";
             } else {
                 return "Fail!";
             }
@@ -66,19 +72,22 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    @Override
     public void saveUser(User user) {
         userRepository.save(user);
     }
 
+    @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-
+    @Override
     public User updateOrAddTheImage(Long userId, MultipartFile imageFile) throws IOException {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
@@ -92,18 +101,22 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     public User updateImage(Long userId, MultipartFile imageFile) throws IOException {
         return updateOrAddTheImage(userId, imageFile);
     }
 
+    @Override
     public User addImage(Long userId, MultipartFile imageFile) throws IOException {
         return updateOrAddTheImage(userId, imageFile);
     }
 
+    @Override
     public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
 
+    @Override
     public User patchUserInfo(Long id, User user) throws IOException {
         Optional<User> existingUser = userRepository.findById(id);
         if (existingUser.isPresent()) {
@@ -126,6 +139,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     public User updateUserInfo(Long id, User user) throws IOException {
         Optional<User> existingUser = userRepository.findById(id);
         if (existingUser.isPresent()) {
@@ -140,6 +154,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }

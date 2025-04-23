@@ -5,7 +5,7 @@ import com.example.barun.domain.dtos.RegisterUserDto;
 import com.example.barun.domain.dtos.UserDto;
 import com.example.barun.domain.entities.User;
 import org.mapstruct.Mapper;
-
+// Todo : For mappers new to create new file i.e. RegisterUserRequestDto and LoginUserRequestDto
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
