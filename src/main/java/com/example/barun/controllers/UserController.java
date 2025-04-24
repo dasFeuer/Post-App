@@ -1,7 +1,9 @@
 package com.example.barun.controllers;
 
-import com.example.barun.domain.dtos.LoginUserDto;
-import com.example.barun.domain.dtos.RegisterUserDto;
+import com.example.barun.domain.dtos.LoginUserRequest;
+import com.example.barun.domain.RegisterUserRequest;
+import com.example.barun.domain.dtos.AuthResponse;
+import com.example.barun.domain.dtos.UserDto;
 import com.example.barun.domain.entities.User;
 import com.example.barun.mappers.UserMapper;
 import com.example.barun.services.UserService;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -51,32 +54,38 @@ public class UserController{
     }
 
     @PostMapping("/register")
-    private ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto registerUserDto){
-        User newUser = userService.registerTheUser(registerUserDto);
+    private ResponseEntity<UserDto> register(@Valid @RequestBody RegisterUserRequest registerUserRequest){
+        RegisterUserRequest userRequest = userMapper.toRegisterUserDto(registerUserRequest);
+        User newUser = userService.registerTheUser(userRequest);
+        UserDto registerUserDto = userMapper.toDto(newUser);
         System.out.println("User registered!");
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(registerUserDto);
     }
 
-//    @PostMapping("/login") --> For this: Service/ Business logic not needed
-//    private ResponseEntity<String> login(@RequestBody LoginUserDto loginUserDto){
-//        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-//                loginUserDto.getUsername(),
-//                loginUserDto.getPassword()
-//        ));
-//        UserDetails userDetails = userDetailsServiceImplementation.loadUserByUsername(loginUserDto.getUsername());
-//        String jwt = jwtService.generateToken(userDetails.getUsername());
-//        System.out.println("User logged in!");
-//        return ResponseEntity.status(HttpStatus.ACCEPTED).body(jwt);
+    @PostMapping("/login") // --> For this: Service/ Business logic
+    private ResponseEntity<AuthResponse> loginUser(@RequestBody LoginUserRequest loginUserRequest){
+        Authentication authentication = authenticationManager.authenticate
+                (new UsernamePasswordAuthenticationToken(
+                loginUserRequest.getUsername(),
+                loginUserRequest.getPassword()
+        )
+                );
+        String tokenValue = jwtService.generateToken(authentication.getName());
+        AuthResponse authResponse = new AuthResponse();
+                authResponse.setToken(tokenValue);
+                authResponse.setExpiresIn(86400);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(authResponse);
+    }
+
+
+//    @PostMapping("/login") // --> For this: Service/ Business logic needed (UserServiceImpl.java)
+//    private ResponseEntity<String> login(@Valid @RequestBody LoginUserRequest loginUserRequest){
+//        String userJwt = userService.verifyTheUser(loginUserRequest);
+//        if ("Fail!".equals(userJwt)) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed!");
+//        }
+//        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userJwt);
 //    }
-
-    @PostMapping("/login") // --> For this: Service/ Business logic needed (UserServiceImpl.java)
-    private ResponseEntity<String> login(@Valid @RequestBody LoginUserDto loginUserDto){
-        String userJwt = userService.verifyTheUser(loginUserDto);
-        if ("Fail!".equals(userJwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed!");
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userJwt);
-    }
 
     @GetMapping("/allUsers")
     private ResponseEntity<List<User>> getAllUsers(){

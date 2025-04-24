@@ -1,17 +1,16 @@
 package com.example.barun.mappers;
 
-import com.example.barun.domain.dtos.LoginUserDto;
-import com.example.barun.domain.dtos.RegisterUserDto;
+import com.example.barun.domain.RegisterUserRequest;
 import com.example.barun.domain.dtos.UserDto;
 import com.example.barun.domain.entities.User;
+import jakarta.validation.Valid;
 import org.mapstruct.Mapper;
-// Todo : For mappers new to create new file i.e. RegisterUserRequestDto and LoginUserRequestDto
+// Todo : For mappers new to create new file i.e. RegisterUserRequestDto
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
     UserDto toDto(User user);
 
-    RegisterUserDto toRegisterUserDto(User user);
+    RegisterUserRequest toRegisterUserDto(@Valid RegisterUserRequest registerUserRequestDto);
 
-    LoginUserDto toLoginUserDto(User user);
 }

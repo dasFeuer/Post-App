@@ -1,8 +1,8 @@
 package com.example.barun.services.impl;
 
 import com.example.barun.domain.dtos.AuthResponse;
-import com.example.barun.domain.dtos.LoginUserDto;
-import com.example.barun.domain.dtos.RegisterUserDto;
+import com.example.barun.domain.dtos.LoginUserRequest;
+import com.example.barun.domain.RegisterUserRequest;
 import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.UserRepository;
 import com.example.barun.services.UserService;
@@ -37,50 +37,50 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User registerTheUser(RegisterUserDto registerUserDto) {
+    public User registerTheUser(RegisterUserRequest registerUserRequest) {
         try{
             User newUser = new User();
-            newUser.setFullName(registerUserDto.getFullName());
-            newUser.setUsername(registerUserDto.getUsername());
-            newUser.setEmail(registerUserDto.getEmail());
-            newUser.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
+            newUser.setFullName(registerUserRequest.getFullName());
+            newUser.setUsername(registerUserRequest.getUsername());
+            newUser.setEmail(registerUserRequest.getEmail());
+            newUser.setPassword(passwordEncoder.encode(registerUserRequest.getPassword()));
             return userRepository.save(newUser);
         } catch (Exception e){
             throw new RuntimeException("User valid input! " + e);
         }
     }
 
-    @Override
-    public String verifyTheUser(LoginUserDto loginUserDto) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    loginUserDto.getUsername(),
-                    loginUserDto.getPassword()
-            ));
-            if (authentication.isAuthenticated()) {
-                String tokenValue = jwtService.generateToken(loginUserDto.getUsername());
-                AuthResponse authResponse = new AuthResponse();
-                authResponse.setToken(tokenValue);
-                authResponse.setExpiresIn(86400);
-                return "Token: " + authResponse.getToken() + "\n" +
-                        "Expires in: " + authResponse.getExpiresIn() + " seconds";
-            } else {
-                return "Fail!";
-            }
-        } catch (Exception e) {
-            throw new UsernameNotFoundException("User valid input! " + e);
-        }
-    }
+//    @Override
+//    public String verifyTheUser(LoginUserRequest loginUserRequest) {
+//        try {
+//            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+//                    loginUserRequest.getUsername(),
+//                    loginUserRequest.getPassword()
+//            ));
+//            if (authentication.isAuthenticated()) {
+//                String tokenValue = jwtService.generateToken(loginUserRequest.getUsername());
+//                AuthResponse authResponse = new AuthResponse();
+//                authResponse.setToken(tokenValue);
+//                authResponse.setExpiresIn(86400);
+//                return "Token: " + authResponse.getToken() + "\n" +
+//                        "Expires in: " + authResponse.getExpiresIn() + " seconds";
+//            } else {
+//                return "Fail!";
+//            }
+//        } catch (Exception e) {
+//            throw new UsernameNotFoundException("User valid input! " + e);
+//        }
+//    }
 
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    @Override
-    public void saveUser(User user) {
-        userRepository.save(user);
-    }
+//    @Override
+//    public void saveUser(User user) {
+//        userRepository.save(user);
+//    }
 
     @Override
     public User getUserByUsername(String username) {

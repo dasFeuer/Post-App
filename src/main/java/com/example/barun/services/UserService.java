@@ -1,7 +1,7 @@
 package com.example.barun.services;
 
-import com.example.barun.domain.dtos.LoginUserDto;
-import com.example.barun.domain.dtos.RegisterUserDto;
+import com.example.barun.domain.dtos.LoginUserRequest;
+import com.example.barun.domain.RegisterUserRequest;
 import com.example.barun.domain.entities.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,13 +10,13 @@ import java.util.List;
 
 public interface UserService {
 
-    User registerTheUser(RegisterUserDto registerUserDto);
+    User registerTheUser(RegisterUserRequest registerUserRequest);
 
-    String verifyTheUser(LoginUserDto loginUserDto);
+//    String verifyTheUser(LoginUserRequest loginUserRequest);
 
     List<User> getAllUsers();
 
-    void saveUser(User user);
+//    void saveUser(User user);
 
     User getUserByUsername(String username);
 
