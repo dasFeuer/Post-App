@@ -1,5 +1,6 @@
 package com.example.barun.services;
 
+import com.example.barun.domain.UpdateUserDataRequest;
 import com.example.barun.domain.dtos.LoginUserRequest;
 import com.example.barun.domain.RegisterUserRequest;
 import com.example.barun.domain.entities.User;
@@ -30,7 +31,7 @@ public interface UserService {
 
     User patchUserInfo(Long id, User user) throws IOException;
 
-    User updateUserInfo(Long id, User user) throws IOException;
+    User updateUserInfo(Long id, UpdateUserDataRequest updateUserDataRequest) throws IOException;
 
     void deleteUser(Long id);
 }

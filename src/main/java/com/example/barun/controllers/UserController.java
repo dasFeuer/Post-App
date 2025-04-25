@@ -1,9 +1,8 @@
 package com.example.barun.controllers;
 
-import com.example.barun.domain.dtos.LoginUserRequest;
+import com.example.barun.domain.UpdateUserDataRequest;
+import com.example.barun.domain.dtos.*;
 import com.example.barun.domain.RegisterUserRequest;
-import com.example.barun.domain.dtos.AuthResponse;
-import com.example.barun.domain.dtos.UserDto;
 import com.example.barun.domain.entities.User;
 import com.example.barun.mappers.UserMapper;
 import com.example.barun.services.UserService;
@@ -54,8 +53,8 @@ public class UserController{
     }
 
     @PostMapping("/register")
-    private ResponseEntity<UserDto> register(@Valid @RequestBody RegisterUserRequest registerUserRequest){
-        RegisterUserRequest userRequest = userMapper.toRegisterUserDto(registerUserRequest);
+    private ResponseEntity<UserDto> register(@Valid @RequestBody RegisterUserRequestDto registerUserRequestDto){
+        RegisterUserRequest userRequest = userMapper.toRegisterUserRequest(registerUserRequestDto);
         User newUser = userService.registerTheUser(userRequest);
         UserDto registerUserDto = userMapper.toDto(newUser);
         System.out.println("User registered!");
@@ -88,30 +87,33 @@ public class UserController{
 //    }
 
     @GetMapping("/allUsers")
-    private ResponseEntity<List<User>> getAllUsers(){
+    private ResponseEntity<List<UserDto>> getAllUsers(){
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         try{
            List<User> allUsers = userService.getAllUsers();
-            return ResponseEntity.ok(allUsers);
-        }catch (Exception e){
+           List<UserDto> userDtos = allUsers.stream()
+                   .map(user -> userMapper.toDto(user)).toList();
+            return ResponseEntity.ok(userDtos);
+        } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<User> getUserById(@PathVariable Long id){
+    private ResponseEntity<UserDto> getUserById(@PathVariable Long id){
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
             try{
                 User user = userService.getUserById(id);
+                UserDto userDto = userMapper.toDto(user);
                 // Ternary operator-> conditions ? valueIfTure : valueIfFalse --> Can be used to handling the null check
                 return user != null
-                        ? ResponseEntity.ok(user)
+                        ? ResponseEntity.ok(userDto)
                         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
 //                if(user != null){
 //                    return new ResponseEntity<>(user, HttpStatus.FOUND);
@@ -126,7 +128,7 @@ public class UserController{
 
     @PostMapping("/{id}/addImage")
     public ResponseEntity<?> addUserImage(@PathVariable("id") Long userId,
-                                           @RequestPart("file")MultipartFile multipartFile) {
+                                           @RequestPart("file") MultipartFile multipartFile) {
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null) {
             return unauthorized();
@@ -201,7 +203,9 @@ public class UserController{
     }
 
     @PutMapping("/{id}/updateData")
-    public ResponseEntity<User> updateData(@PathVariable Long id, @RequestBody User user) throws IOException {
+    public ResponseEntity<UserDto> updateUserData(@PathVariable Long id,
+                                                  @Valid @RequestBody UpdateUserDataRequestDto updateUserDataRequestDto)
+            throws IOException {
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -210,8 +214,10 @@ public class UserController{
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
             try{
-                User updatedUser = userService.updateUserInfo(id, user);
-                return ResponseEntity.ok().body(updatedUser);
+                UpdateUserDataRequest updateUserDataRequest = userMapper.toUpdateUserDataRequest(updateUserDataRequestDto);
+                User updatedUser = userService.updateUserInfo(id, updateUserDataRequest);
+                UserDto updatedUserDto = userMapper.toDto(updatedUser);
+                return ResponseEntity.ok().body(updatedUserDto);
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -237,16 +243,17 @@ public class UserController{
     }
 
     @GetMapping("/{userUsername}/username")
-    public ResponseEntity<User> getByUsername(@PathVariable String userUsername){
+    public ResponseEntity<UserDto> getByUsername(@PathVariable String userUsername){
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
             try{
                 User userByUsername = userService.getUserByUsername(userUsername);
+                UserDto userByUsernameDto = userMapper.toDto(userByUsername);
 //                return new ResponseEntity<>(userByUsername, HttpStatus.OK);
                 return userByUsername != null
-                        ? ResponseEntity.ok(userByUsername)
+                        ? ResponseEntity.ok(userByUsernameDto)
                         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

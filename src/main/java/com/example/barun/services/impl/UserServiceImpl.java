@@ -1,5 +1,6 @@
 package com.example.barun.services.impl;
 
+import com.example.barun.domain.UpdateUserDataRequest;
 import com.example.barun.domain.dtos.AuthResponse;
 import com.example.barun.domain.dtos.LoginUserRequest;
 import com.example.barun.domain.RegisterUserRequest;
@@ -140,19 +141,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUserInfo(Long id, User user) throws IOException {
+    public User updateUserInfo(Long id, UpdateUserDataRequest updateUserDataRequest) throws IOException {
         Optional<User> existingUser = userRepository.findById(id);
         if (existingUser.isPresent()) {
             User updatedUser = existingUser.get();
-            updatedUser.setUsername(user.getUsername());
-            updatedUser.setEmail(user.getEmail());
-            updatedUser.setFullName(user.getFullName());
-            updatedUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            updatedUser.setUsername(updateUserDataRequest.getUsername());
+            updatedUser.setEmail(updateUserDataRequest.getEmail());
+            updatedUser.setFullName(updateUserDataRequest.getFullName());
+            updatedUser.setPassword(passwordEncoder.encode(updateUserDataRequest.getPassword()));
             return userRepository.save(updatedUser);
         } else {
             throw new IOException("User not found!");
         }
     }
+
 
     @Override
     public void deleteUser(Long id) {
