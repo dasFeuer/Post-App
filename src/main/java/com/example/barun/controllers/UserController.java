@@ -1,5 +1,6 @@
 package com.example.barun.controllers;
 
+import com.example.barun.domain.PatchUserDataRequest;
 import com.example.barun.domain.UpdateUserDataRequest;
 import com.example.barun.domain.dtos.*;
 import com.example.barun.domain.RegisterUserRequest;
@@ -139,7 +140,7 @@ public class UserController{
         }
 
         try {
-            User theUser = userService.addImage(userId, multipartFile);
+            User theUser = userService.addUserProfileImage(userId, multipartFile);
             return ResponseEntity.status(HttpStatus.CREATED).body(theUser);
         } catch (IOException exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
@@ -184,7 +185,8 @@ public class UserController{
     }
 
     @PatchMapping("/{id}/patchData")
-    public ResponseEntity<User> patchUserData(@PathVariable Long id, @RequestBody User user) throws IOException {
+    public ResponseEntity<UserDto> patchUserData(@PathVariable Long id,
+                                                 @RequestBody PatchUserDataRequestDto patchUserDataRequestDto) throws IOException {
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -195,8 +197,10 @@ public class UserController{
         }
 
         try {
-                User updatedUser = userService.patchUserInfo(id, user);
-                return ResponseEntity.ok().body(updatedUser);
+            PatchUserDataRequest patchUserDataRequest = userMapper.toPatchUserDataRequest(patchUserDataRequestDto);
+                User updatedUser = userService.patchUserInfo(id, patchUserDataRequest);
+                UserDto userDto = userMapper.toDto(updatedUser);
+                return ResponseEntity.ok().body(userDto);
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }

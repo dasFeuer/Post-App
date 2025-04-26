@@ -1,5 +1,6 @@
 package com.example.barun.services.impl;
 
+import com.example.barun.domain.PatchUserDataRequest;
 import com.example.barun.domain.UpdateUserDataRequest;
 import com.example.barun.domain.dtos.AuthResponse;
 import com.example.barun.domain.dtos.LoginUserRequest;
@@ -108,7 +109,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User addImage(Long userId, MultipartFile imageFile) throws IOException {
+    public User addUserProfileImage(Long userId, MultipartFile imageFile) throws IOException {
         return updateOrAddTheImage(userId, imageFile);
     }
 
@@ -118,21 +119,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User patchUserInfo(Long id, User user) throws IOException {
+    public User patchUserInfo(Long id, PatchUserDataRequest patchUserDataRequest) throws IOException {
         Optional<User> existingUser = userRepository.findById(id);
         if (existingUser.isPresent()) {
             User updateUser = existingUser.get();
-            if (user.getUsername() != null) {
-                updateUser.setUsername(user.getUsername());
+            if (patchUserDataRequest.getUsername() != null) {
+                updateUser.setUsername(patchUserDataRequest.getUsername());
             }
-            if (user.getEmail() != null) {
-                updateUser.setEmail(user.getEmail());
+            if (patchUserDataRequest.getEmail() != null) {
+                updateUser.setEmail(patchUserDataRequest.getEmail());
             }
-            if (user.getFullName() != null) {
-                updateUser.setFullName(user.getFullName());
+            if (patchUserDataRequest.getFullName() != null) {
+                updateUser.setFullName(patchUserDataRequest.getFullName());
             }
-            if (user.getPassword() != null) {
-                updateUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            if (patchUserDataRequest.getPassword() != null) {
+                updateUser.setPassword(passwordEncoder.encode(patchUserDataRequest.getPassword()));
             }
             return userRepository.save(updateUser);
         } else {
