@@ -6,7 +6,6 @@ import com.example.barun.domain.UpdateUserDataRequest;
 import com.example.barun.domain.dtos.*;
 import com.example.barun.domain.entities.User;
 import org.mapstruct.Mapper;
-import org.springframework.web.multipart.MultipartFile;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {

@@ -2,6 +2,7 @@ package com.example.barun.controllers;
 
 import com.example.barun.domain.PatchUserDataRequest;
 import com.example.barun.domain.UpdateUserDataRequest;
+import com.example.barun.domain.UserSummaryDto;
 import com.example.barun.domain.dtos.*;
 import com.example.barun.domain.RegisterUserRequest;
 import com.example.barun.domain.entities.User;
@@ -88,15 +89,21 @@ public class UserController{
 //    }
 
     @GetMapping("/allUsers")
-    private ResponseEntity<List<UserDto>> getAllUsers(){
+    private ResponseEntity<List<UserSummaryDto>> getAllUsers(){
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         try{
            List<User> allUsers = userService.getAllUsers();
-           List<UserDto> userDtos = allUsers.stream()
-                   .map(user -> userMapper.toDto(user)).toList();
+           List<UserSummaryDto> userDtos = allUsers.stream()
+                   .map(user -> { UserSummaryDto dto = new UserSummaryDto();
+                            dto.setId(user.getId());
+                            dto.setFullName(user.getFullName());
+                            dto.setUsername(user.getUsername());
+                            dto.setEmail(user.getEmail());
+                            return dto;
+                   }).toList();
             return ResponseEntity.ok(userDtos);
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -128,11 +135,12 @@ public class UserController{
 
 
     @PostMapping("/{id}/addImage")
-    public ResponseEntity<?> addUserImage(@PathVariable("id") Long userId,
-                                           @RequestPart("file") MultipartFile multipartFile) {
+    public ResponseEntity<UserProfileResponseDto> addUserImage(
+            @PathVariable("id") Long userId,
+            @RequestPart("file") MultipartFile multipartFile) {
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null) {
-            return unauthorized();
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         if(!loggedInUser.getId().equals(userId)){
@@ -140,10 +148,17 @@ public class UserController{
         }
 
         try {
+            // Check if the user already had an image file exists
+            if (loggedInUser.getImageData() != null) {
+                return new ResponseEntity<>(HttpStatus.CONFLICT);
+            }
             User theUser = userService.addUserProfileImage(userId, multipartFile);
-            return ResponseEntity.status(HttpStatus.CREATED).body(theUser);
+            UserProfileResponseDto userProfileResponseDto = new UserProfileResponseDto();
+            userProfileResponseDto.setImageType(theUser.getImageType());
+            userProfileResponseDto.setImageName(theUser.getImageName());
+            return ResponseEntity.status(HttpStatus.CREATED).body(userProfileResponseDto);
         } catch (IOException exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -160,6 +175,9 @@ public class UserController{
         }
 
             try {
+                if (loggedInUser.getImageData() == null) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image not found, first upload an image to update it.");
+                }
                 User theUser = userService.updateImage(userId, multipartFile);
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(theUser);
             } catch (Exception exception){
