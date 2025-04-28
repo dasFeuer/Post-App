@@ -162,4 +162,18 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
+    @Override
+    public void deleteUserImageById(Long id) {
+        Optional<User> existingUser = userRepository.findById(id);
+        if (existingUser.isPresent()) {
+            User userImage = existingUser.get();
+            userImage.setImageData(null);
+            userImage.setImageType(null);
+            userImage.setImageName(null);
+            userRepository.save(userImage);
+        } else {
+            throw new RuntimeException("User Image not found!");
+        }
+    }
+
 }

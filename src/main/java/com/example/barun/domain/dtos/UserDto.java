@@ -15,7 +15,6 @@ import java.util.List;
 public class UserDto {
     private Long id;
     @Lob
-    @JsonIgnore
     @JdbcTypeCode(Types.LONGVARBINARY)
     private byte[] imageData;
     private String imageType;

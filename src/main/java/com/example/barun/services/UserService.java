@@ -34,4 +34,6 @@ public interface UserService {
     User updateUserInfo(Long id, UpdateUserDataRequest updateUserDataRequest) throws IOException;
 
     void deleteUser(Long id);
+
+    void deleteUserImageById(Long id);
 }

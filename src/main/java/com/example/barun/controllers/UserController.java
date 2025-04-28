@@ -63,7 +63,7 @@ public class UserController{
         return ResponseEntity.status(HttpStatus.CREATED).body(registerUserDto);
     }
 
-    @PostMapping("/login") // --> For this: Service/ Business logic
+    @PostMapping("/login") // --> For this: Service/ Business logic not needed
     private ResponseEntity<AuthResponse> loginUser(@RequestBody LoginUserRequest loginUserRequest){
         Authentication authentication = authenticationManager.authenticate
                 (new UsernamePasswordAuthenticationToken(
@@ -264,19 +264,41 @@ public class UserController{
             }
     }
 
+    @DeleteMapping("/{id}/deleteUserImage")
+    public ResponseEntity<Void> deleteUserImage(@PathVariable Long id){
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if(!loggedInUser.getId().equals(id)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+            try{
+                userService.deleteUserImageById(id);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } catch (Exception e){
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+    }
+
     @GetMapping("/{userUsername}/username")
-    public ResponseEntity<UserDto> getByUsername(@PathVariable String userUsername){
+    public ResponseEntity<UserSummaryDto> getByUsername(@PathVariable String userUsername){
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
             try{
-                User userByUsername = userService.getUserByUsername(userUsername);
-                UserDto userByUsernameDto = userMapper.toDto(userByUsername);
+                User user = userService.getUserByUsername(userUsername);
+                UserSummaryDto userByUsername= new UserSummaryDto();
+                userByUsername.setId(user.getId());
+                userByUsername.setUsername(user.getUsername());
+                userByUsername.setFullName(user.getFullName());
+                userByUsername.setEmail(user.getEmail());
+
 //                return new ResponseEntity<>(userByUsername, HttpStatus.OK);
-                return userByUsername != null
-                        ? ResponseEntity.ok(userByUsernameDto)
-                        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                return ResponseEntity.ok(userByUsername);
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
