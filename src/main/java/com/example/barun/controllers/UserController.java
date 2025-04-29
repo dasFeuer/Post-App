@@ -135,7 +135,7 @@ public class UserController{
 
 
     @PostMapping("/{id}/addImage")
-    public ResponseEntity<UserProfileResponseDto> addUserImage(
+    public ResponseEntity<?> addUserImage(
             @PathVariable("id") Long userId,
             @RequestPart("file") MultipartFile multipartFile) {
         User loggedInUser = getAuthenticatedUser();
@@ -150,7 +150,7 @@ public class UserController{
         try {
             // Check if the user already had an image file exists
             if (loggedInUser.getImageData() != null) {
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Image already added, please update it!");
             }
             User theUser = userService.addUserProfileImage(userId, multipartFile);
             UserProfileResponseDto userProfileResponseDto = new UserProfileResponseDto();
@@ -176,12 +176,15 @@ public class UserController{
 
             try {
                 if (loggedInUser.getImageData() == null) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image not found, first upload an image to update it.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("First add/upload the image to update it");
                 }
                 User theUser = userService.updateImage(userId, multipartFile);
-                return ResponseEntity.status(HttpStatus.ACCEPTED).body(theUser);
+                UserProfileResponseDto userProfileResponseDto = new UserProfileResponseDto();
+                userProfileResponseDto.setImageType(theUser.getImageType());
+                userProfileResponseDto.setImageName(theUser.getImageName());
+                return ResponseEntity.status(HttpStatus.CREATED).body(userProfileResponseDto);
             } catch (Exception exception){
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
     }
 
