@@ -3,19 +3,13 @@ package com.example.barun.domain.dtos;
 import com.example.barun.domain.entities.Comments;
 import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.PostLike;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Lob;
-import org.hibernate.annotations.JdbcTypeCode;
 
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class UserDto {
     private Long id;
-    @Lob
-    @JdbcTypeCode(Types.LONGVARBINARY)
     private byte[] imageData;
     private String imageType;
     private String imageName;

@@ -1,7 +1,7 @@
 package com.example.barun.services.impl;
 
+import com.example.barun.domain.dtos.CreatePostRequestDto;
 import com.example.barun.domain.entities.Post;
-import com.example.barun.domain.dtos.PostRequestDto;
 import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.PostRepository;
 import jakarta.transaction.Transactional;
@@ -26,7 +26,7 @@ public class PostService {
     private UserServiceImpl userServiceImpl;
 
     @Transactional
-    public Post createPostByUser(PostRequestDto postRequestDto) {
+    public Post createPostByUser(CreatePostRequestDto createPostRequestDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User author = userServiceImpl.getUserByUsername(username);
@@ -34,8 +34,8 @@ public class PostService {
 
         if (!username.isEmpty()) {
             Post newPost = new Post();
-            newPost.setTitle(postRequestDto.getTitle());
-            newPost.setContent(postRequestDto.getContent());
+            newPost.setTitle(createPostRequestDto.getTitle());
+            newPost.setContent(createPostRequestDto.getContent());
             newPost.setAuthor(author);
 
             return postRepository.save(newPost);
@@ -78,27 +78,27 @@ public class PostService {
     }
 
 
-    public Post updatePost(Long postId, PostRequestDto postRequestDto) throws Exception {
+    public Post updatePost(Long postId, CreatePostRequestDto createPostRequestDto) throws Exception {
         Optional<Post> existingPost = postRepository.findById(postId);
         if(existingPost.isPresent()){
             Post updatedPost = existingPost.get();
-            updatedPost.setTitle(postRequestDto.getTitle());
-            updatedPost.setContent(postRequestDto.getContent());
+            updatedPost.setTitle(createPostRequestDto.getTitle());
+            updatedPost.setContent(createPostRequestDto.getContent());
             return postRepository.save(updatedPost);
         } else {
             throw new IOException("Post not found");
         }
     }
 
-    public Post patchPost(Long postId, PostRequestDto postRequestDto) throws Exception {
+    public Post patchPost(Long postId, CreatePostRequestDto createPostRequestDto) throws Exception {
         Optional<Post> existingPost = postRepository.findById(postId);
         if(existingPost.isPresent()){
             Post updatedPost = existingPost.get();
-            if(postRequestDto.getTitle() != null){
-                updatedPost.setTitle(postRequestDto.getTitle());
+            if(createPostRequestDto.getTitle() != null){
+                updatedPost.setTitle(createPostRequestDto.getTitle());
             }
-            if(postRequestDto.getContent() != null){
-                updatedPost.setContent(postRequestDto.getContent());
+            if(createPostRequestDto.getContent() != null){
+                updatedPost.setContent(createPostRequestDto.getContent());
             }
             return postRepository.save(updatedPost);
         }

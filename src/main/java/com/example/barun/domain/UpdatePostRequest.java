@@ -1,9 +1,17 @@
-package com.example.barun.domain.dtos;
+package com.example.barun.domain;
 
-public class PostRequestDto {
+public class UpdatePostRequest {
     private String title;
 
     private String content;
+
+    public UpdatePostRequest() {
+    }
+
+    public UpdatePostRequest(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 
     public String getTitle() {
         return title;
@@ -20,4 +28,5 @@ public class PostRequestDto {
     public void setContent(String content) {
         this.content = content;
     }
+
 }

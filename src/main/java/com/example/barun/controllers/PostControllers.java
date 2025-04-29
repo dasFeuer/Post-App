@@ -1,7 +1,7 @@
 package com.example.barun.controllers;
 
+import com.example.barun.domain.dtos.CreatePostRequestDto;
 import com.example.barun.domain.entities.Post;
-import com.example.barun.domain.dtos.PostRequestDto;
 import com.example.barun.domain.entities.User;
 import com.example.barun.services.impl.PostService;
 import com.example.barun.services.impl.UserServiceImpl;
@@ -43,8 +43,8 @@ public class PostControllers {
     }
 
     @PostMapping("/createPost")
-    public ResponseEntity<Post> create(@RequestBody PostRequestDto postRequestDto){
-        Post createdPost = postService.createPostByUser(postRequestDto);
+    public ResponseEntity<Post> create(@RequestBody CreatePostRequestDto createPostRequestDto){
+        Post createdPost = postService.createPostByUser(createPostRequestDto);
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
 
@@ -169,7 +169,7 @@ public class PostControllers {
     @PutMapping("{postId}/updatePost")
     public ResponseEntity<Post> updatePost(
             @PathVariable Long postId,
-            @RequestBody PostRequestDto postRequestDto)
+            @RequestBody CreatePostRequestDto createPostRequestDto)
             throws Exception {
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null){
@@ -179,7 +179,7 @@ public class PostControllers {
         Optional<Post> postById = postService.getPostById(postId);
         if(postById.isPresent()){
             if(isPostOwnedByUser(postId, loggedInUser)){
-                Post post = postService.updatePost(postId, postRequestDto);
+                Post post = postService.updatePost(postId, createPostRequestDto);
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(post);
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -191,7 +191,7 @@ public class PostControllers {
     @PatchMapping("{postId}/patchPost")
     public ResponseEntity<Post> patchPost(
             @PathVariable Long postId,
-            @RequestBody PostRequestDto postRequestDto)
+            @RequestBody CreatePostRequestDto createPostRequestDto)
             throws Exception {
         User loggedInUser = getAuthenticatedUser();
         if (loggedInUser == null) {
@@ -201,7 +201,7 @@ public class PostControllers {
         Optional<Post> postById = postService.getPostById(postId);
         if (postById.isPresent()) {
             if (isPostOwnedByUser(postId, loggedInUser)) {
-                Post post = postService.patchPost(postId, postRequestDto);
+                Post post = postService.patchPost(postId, createPostRequestDto);
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(post);
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
