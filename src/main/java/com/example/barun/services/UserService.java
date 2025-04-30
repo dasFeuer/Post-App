@@ -12,28 +12,17 @@ import java.util.List;
 public interface UserService {
 
     User registerTheUser(RegisterUserRequest registerUserRequest);
-
-//    String verifyTheUser(LoginUserRequest loginUserRequest);
-
     List<User> getAllUsers();
-
-//    void saveUser(User user);
-
     User getUserByUsername(String username);
-
     User updateOrAddTheImage(Long userId, MultipartFile imageFile) throws IOException;
-
     User updateImage(Long userId, MultipartFile imageFile) throws IOException;
-
     User addUserProfileImage(Long userId, MultipartFile imageFile) throws IOException;
-
     User getUserById(Long id);
-
-    User patchUserInfo(Long id, PatchUserDataRequest patchUserDataRequest) throws IOException;
-
-    User updateUserInfo(Long id, UpdateUserDataRequest updateUserDataRequest) throws IOException;
-
+    User patchUserInfo(Long id, PatchUserDataRequest patchUserDataRequest);
+    User updateUserInfo(Long id, UpdateUserDataRequest updateUserDataRequest);
     void deleteUser(Long id);
-
     void deleteUserImageById(Long id);
+    //    void saveUser(User user);
+    //    String verifyTheUser(LoginUserRequest loginUserRequest);
+
 }

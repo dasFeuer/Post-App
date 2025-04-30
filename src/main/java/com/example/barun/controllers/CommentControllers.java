@@ -4,7 +4,7 @@ import com.example.barun.domain.dtos.CommentDto;
 import com.example.barun.domain.entities.Comments;
 import com.example.barun.domain.entities.User;
 import com.example.barun.services.impl.CommentService;
-import com.example.barun.services.impl.PostService;
+import com.example.barun.services.impl.PostServiceImpl;
 import com.example.barun.services.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +28,7 @@ public class CommentControllers {
     private UserServiceImpl userServiceImpl;
 
     @Autowired
-    private PostService postService;
+    private PostServiceImpl postServiceImpl;
 
     private boolean isCommentOwnedByUser(Long commentId, User loggedInUser){
         Optional<Comments> comments = commentService.getCommentsById(commentId);

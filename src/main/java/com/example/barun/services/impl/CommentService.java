@@ -21,7 +21,7 @@ public class CommentService {
     private CommentRepository commentRepository;
 
     @Autowired
-    private PostService postService;
+    private PostServiceImpl postServiceImpl;
 
     @Autowired
     private UserServiceImpl userServiceImpl;
@@ -31,7 +31,7 @@ public class CommentService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User existingUser = userServiceImpl.getUserByUsername(username);
-        Optional<Post> existingPost = postService.getPostById(postId);
+        Optional<Post> existingPost = postServiceImpl.getPostById(postId);
 
         if(existingPost.isPresent()) {
             Post thepost = existingPost.get();
@@ -74,7 +74,7 @@ public class CommentService {
     }
 
     public List<Comments> getCommentsByPostId(Long postId){
-        if(postService.getPostById(postId).isEmpty()){
+        if(postServiceImpl.getPostById(postId).isEmpty()){
             throw new RuntimeException("Post not found");
         }
         return commentRepository.findCommentsByPostId(postId);

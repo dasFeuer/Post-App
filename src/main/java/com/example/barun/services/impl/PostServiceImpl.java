@@ -4,6 +4,8 @@ import com.example.barun.domain.dtos.CreatePostRequestDto;
 import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.PostRepository;
+import com.example.barun.services.PostService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -17,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PostService {
+public class PostServiceImpl implements PostService {
 
     @Autowired
     private PostRepository postRepository;
@@ -25,6 +27,7 @@ public class PostService {
     @Autowired
     private UserServiceImpl userServiceImpl;
 
+    @Override
     @Transactional
     public Post createPostByUser(CreatePostRequestDto createPostRequestDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -44,18 +47,22 @@ public class PostService {
         }
     }
 
+    @Override
     public Optional<Post> getPostById(Long id) {
         return postRepository.findById(id);
     }
 
+    @Override
     public List<Post> getAllPosts() {
         return postRepository.findAll();
     }
 
+    @Override
     public void deletePostById(Long id) {
         postRepository.deleteById(id);
     }
 
+    @Override
     public Post updateOrAddTheImage(Long postId, MultipartFile multipartFile) throws IOException {
         Optional<Post> post = postRepository.findById(postId);
         if (post.isPresent()) {
@@ -69,16 +76,19 @@ public class PostService {
         }
     }
 
+    @Override
     public Post updateImage(Long postId, MultipartFile multipartFile) throws IOException {
         return updateOrAddTheImage(postId, multipartFile);
     }
 
+    @Override
     public Post addImage(Long postId, MultipartFile multipartFile) throws IOException {
         return updateOrAddTheImage(postId, multipartFile);
     }
 
 
-    public Post updatePost(Long postId, CreatePostRequestDto createPostRequestDto) throws Exception {
+    @Override
+    public Post updatePost(Long postId, CreatePostRequestDto createPostRequestDto) {
         Optional<Post> existingPost = postRepository.findById(postId);
         if(existingPost.isPresent()){
             Post updatedPost = existingPost.get();
@@ -86,11 +96,12 @@ public class PostService {
             updatedPost.setContent(createPostRequestDto.getContent());
             return postRepository.save(updatedPost);
         } else {
-            throw new IOException("Post not found");
+            throw new EntityNotFoundException("Post not found");
         }
     }
 
-    public Post patchPost(Long postId, CreatePostRequestDto createPostRequestDto) throws Exception {
+    @Override
+    public Post patchPost(Long postId, CreatePostRequestDto createPostRequestDto) {
         Optional<Post> existingPost = postRepository.findById(postId);
         if(existingPost.isPresent()){
             Post updatedPost = existingPost.get();
@@ -102,6 +113,6 @@ public class PostService {
             }
             return postRepository.save(updatedPost);
         }
-        throw new IOException("Post not found");
+        throw new EntityNotFoundException("Post not found");
     }
 }

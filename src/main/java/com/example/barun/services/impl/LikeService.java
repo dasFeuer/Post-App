@@ -24,7 +24,7 @@ public class LikeService {
     private UserServiceImpl userServiceImpl;
 
     @Autowired
-    private PostService postService;
+    private PostServiceImpl postServiceImpl;
 
     @Transactional
     public boolean toggleLike(Long postId) throws IOException {
@@ -36,7 +36,7 @@ public class LikeService {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
 
-        Optional<Post> optionalPost = postService.getPostById(postId);
+        Optional<Post> optionalPost = postServiceImpl.getPostById(postId);
         if(optionalPost.isEmpty()){
             throw new IOException("Post not found with Id: " + postId);
         }

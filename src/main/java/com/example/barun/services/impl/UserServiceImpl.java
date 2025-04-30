@@ -2,18 +2,14 @@ package com.example.barun.services.impl;
 
 import com.example.barun.domain.PatchUserDataRequest;
 import com.example.barun.domain.UpdateUserDataRequest;
-import com.example.barun.domain.dtos.AuthResponse;
-import com.example.barun.domain.dtos.LoginUserRequest;
 import com.example.barun.domain.RegisterUserRequest;
 import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.UserRepository;
 import com.example.barun.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -119,7 +115,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User patchUserInfo(Long id, PatchUserDataRequest patchUserDataRequest) throws IOException {
+    public User patchUserInfo(Long id, PatchUserDataRequest patchUserDataRequest) {
         Optional<User> existingUser = userRepository.findById(id);
         if (existingUser.isPresent()) {
             User updateUser = existingUser.get();
@@ -137,12 +133,12 @@ public class UserServiceImpl implements UserService {
             }
             return userRepository.save(updateUser);
         } else {
-            throw new IOException("User not found!");
+            throw new EntityNotFoundException("User not found!");
         }
     }
 
     @Override
-    public User updateUserInfo(Long id, UpdateUserDataRequest updateUserDataRequest) throws IOException {
+    public User updateUserInfo(Long id, UpdateUserDataRequest updateUserDataRequest) {
         Optional<User> existingUser = userRepository.findById(id);
         if (existingUser.isPresent()) {
             User updatedUser = existingUser.get();
@@ -152,7 +148,7 @@ public class UserServiceImpl implements UserService {
             updatedUser.setPassword(passwordEncoder.encode(updateUserDataRequest.getPassword()));
             return userRepository.save(updatedUser);
         } else {
-            throw new IOException("User not found!");
+            throw new EntityNotFoundException("User not found!");
         }
     }
 
@@ -172,7 +168,7 @@ public class UserServiceImpl implements UserService {
             userImage.setImageName(null);
             userRepository.save(userImage);
         } else {
-            throw new RuntimeException("User Image not found!");
+            throw new EntityNotFoundException("User Image not found!");
         }
     }
 

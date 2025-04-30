@@ -3,7 +3,7 @@ package com.example.barun.controllers;
 import com.example.barun.domain.dtos.CreatePostRequestDto;
 import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.User;
-import com.example.barun.services.impl.PostService;
+import com.example.barun.services.impl.PostServiceImpl;
 import com.example.barun.services.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,13 +22,13 @@ import java.util.Optional;
 public class PostControllers {
 
     @Autowired
-    private PostService postService;
+    private PostServiceImpl postServiceImpl;
 
     @Autowired
     private UserServiceImpl userServiceImpl;
 
     private boolean isPostOwnedByUser(Long postId, User user){
-        Optional<Post> post = postService.getPostById(postId);
+        Optional<Post> post = postServiceImpl.getPostById(postId);
         return post.isPresent() && post.get().getAuthor().getId().equals(user.getId());
     }
 
@@ -44,7 +44,7 @@ public class PostControllers {
 
     @PostMapping("/createPost")
     public ResponseEntity<Post> create(@RequestBody CreatePostRequestDto createPostRequestDto){
-        Post createdPost = postService.createPostByUser(createPostRequestDto);
+        Post createdPost = postServiceImpl.createPostByUser(createPostRequestDto);
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
 
@@ -55,7 +55,7 @@ public class PostControllers {
 //            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 //        }
 //
-//        Optional<Post> postById = postService.getPostById(id);
+//        Optional<Post> postById = postServiceImpl.getPostById(id);
 //        if(postById.isPresent()){
 //            if (isPostOwnedByUser(id, loggedInUser)){
 //                return ResponseEntity.ok(postById.get());
@@ -65,7 +65,7 @@ public class PostControllers {
 //        }
 //        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Optional<Post> posts = postService.getPostById(id);
+        Optional<Post> posts = postServiceImpl.getPostById(id);
         if(posts.isEmpty()){
             return new ResponseEntity<>("Post not found", HttpStatus.NOT_FOUND);
         }
@@ -78,7 +78,7 @@ public class PostControllers {
         if(loggedInUser == null){
             return unauthorizedUser();
         }
-        return ResponseEntity.ok(postService.getAllPosts());
+        return ResponseEntity.ok(postServiceImpl.getAllPosts());
     }
 
     @DeleteMapping("/{id}/delete")
@@ -88,12 +88,12 @@ public class PostControllers {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 //        List<Post> posts = loggedInUser.getPosts();
-//        postService.deletePostById(id);
+//        postServiceImpl.deletePostById(id);
 //        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(posts);
-        Optional<Post> postById = postService.getPostById(id);
+        Optional<Post> postById = postServiceImpl.getPostById(id);
         if(postById.isPresent()){
             if (isPostOwnedByUser(id, loggedInUser)){
-                postService.deletePostById(id);
+                postServiceImpl.deletePostById(id);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -110,10 +110,10 @@ public class PostControllers {
         if(loggedInUser == null){
             return unauthorizedUser();
         }
-        Optional<Post> postById = postService.getPostById(postId);
+        Optional<Post> postById = postServiceImpl.getPostById(postId);
         if(postById.isPresent()){
             if(isPostOwnedByUser(postId, loggedInUser)){
-                Post post = postService.addImage(postId, multipartFile);
+                Post post = postServiceImpl.addImage(postId, multipartFile);
                 return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -129,7 +129,7 @@ public class PostControllers {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Optional<Post> post = postService.getPostById(postId);
+        Optional<Post> post = postServiceImpl.getPostById(postId);
         if(post.isPresent()){
             if(isPostOwnedByUser(postId, loggedInUser)){
                 byte[] postImageFile = post.get().getPostImageData(); //--> Yes Optional<Post> = post.get().getImageData()
@@ -153,10 +153,10 @@ public class PostControllers {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        Optional<Post> postById = postService.getPostById(postId);
+        Optional<Post> postById = postServiceImpl.getPostById(postId);
         if(postById.isPresent()){
             if(isPostOwnedByUser(postId, loggedInUser)){
-                Post post = postService.updateImage(postId, multipartFile);
+                Post post = postServiceImpl.updateImage(postId, multipartFile);
                 return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -176,10 +176,10 @@ public class PostControllers {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        Optional<Post> postById = postService.getPostById(postId);
+        Optional<Post> postById = postServiceImpl.getPostById(postId);
         if(postById.isPresent()){
             if(isPostOwnedByUser(postId, loggedInUser)){
-                Post post = postService.updatePost(postId, createPostRequestDto);
+                Post post = postServiceImpl.updatePost(postId, createPostRequestDto);
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(post);
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -198,10 +198,10 @@ public class PostControllers {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        Optional<Post> postById = postService.getPostById(postId);
+        Optional<Post> postById = postServiceImpl.getPostById(postId);
         if (postById.isPresent()) {
             if (isPostOwnedByUser(postId, loggedInUser)) {
-                Post post = postService.patchPost(postId, createPostRequestDto);
+                Post post = postServiceImpl.patchPost(postId, createPostRequestDto);
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(post);
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
