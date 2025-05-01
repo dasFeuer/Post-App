@@ -1,10 +1,11 @@
 package com.example.barun.services.impl;
 
+import com.example.barun.domain.CreatePostRequest;
+import com.example.barun.domain.UpdatePostRequest;
 import com.example.barun.domain.dtos.CreatePostRequestDto;
 import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.PostRepository;
-import com.example.barun.services.PostService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PostServiceImpl implements PostService {
+public class PostServiceImpl implements com.example.barun.services.PostService {
 
     @Autowired
     private PostRepository postRepository;
@@ -29,7 +30,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Post createPostByUser(CreatePostRequestDto createPostRequestDto) {
+    public Post createPostByUser(CreatePostRequest createPostRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User author = userServiceImpl.getUserByUsername(username);
@@ -37,8 +38,8 @@ public class PostServiceImpl implements PostService {
 
         if (!username.isEmpty()) {
             Post newPost = new Post();
-            newPost.setTitle(createPostRequestDto.getTitle());
-            newPost.setContent(createPostRequestDto.getContent());
+            newPost.setTitle(createPostRequest.getTitle());
+            newPost.setContent(createPostRequest.getContent());
             newPost.setAuthor(author);
 
             return postRepository.save(newPost);
@@ -46,6 +47,8 @@ public class PostServiceImpl implements PostService {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
     }
+
+
 
     @Override
     public Optional<Post> getPostById(Long id) {
@@ -86,19 +89,31 @@ public class PostServiceImpl implements PostService {
         return updateOrAddTheImage(postId, multipartFile);
     }
 
-
     @Override
-    public Post updatePost(Long postId, CreatePostRequestDto createPostRequestDto) {
-        Optional<Post> existingPost = postRepository.findById(postId);
-        if(existingPost.isPresent()){
-            Post updatedPost = existingPost.get();
-            updatedPost.setTitle(createPostRequestDto.getTitle());
-            updatedPost.setContent(createPostRequestDto.getContent());
-            return postRepository.save(updatedPost);
-        } else {
-            throw new EntityNotFoundException("Post not found");
-        }
+    public Post updatePost(Long postId, UpdatePostRequest updatePostRequest) {
+        Post existingPost = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Post does not exist with id " + postId));
+        existingPost.setTitle(updatePostRequest.getTitle());
+        String postContent = updatePostRequest.getContent();
+        existingPost.setContent(postContent);
+
+        return postRepository.save(existingPost);
+
     }
+
+
+//    @Override
+//    public Post updatePost(Long postId, UpdatePostRequest updatePostRequest) {
+//        Optional<Post> existingPost = postRepository.findById(postId);
+//        if(existingPost.isPresent()){
+//            Post updatedPost = existingPost.get();
+//            updatedPost.setTitle(updatePostRequest.getTitle());
+//            updatedPost.setContent(updatePostRequest.getContent());
+//            return postRepository.save(updatedPost);
+//        } else {
+//            throw new EntityNotFoundException("Post not found");
+//        }
+//    }
 
     @Override
     public Post patchPost(Long postId, CreatePostRequestDto createPostRequestDto) {

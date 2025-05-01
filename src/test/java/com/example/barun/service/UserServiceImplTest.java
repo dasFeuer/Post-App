@@ -22,7 +22,7 @@ public class UserServiceImplTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private UserServiceImpl userService;
+    private UserServiceImpl userServiceImpl;
 
     @Test
     public void testGetUserByUsername() {
@@ -30,7 +30,7 @@ public class UserServiceImplTest {
         User mockUser = new User();
         mockUser.setUsername(username);
         when(userRepository.findByUsername(username)).thenReturn(mockUser);
-        User result = userService.getUserByUsername(username);
+        User result = userServiceImpl.getUserByUsername(username);
         assertNotNull(result);
         assertEquals(username, result.getUsername());
     }
@@ -41,7 +41,7 @@ public class UserServiceImplTest {
         User mockUser = new User();
         mockUser.setId(userId);
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
-        User result = userService.getUserById(userId);
+        User result = userServiceImpl.getUserById(userId);
         assertNotNull(result);
         assertEquals(userId, result.getId());
     }

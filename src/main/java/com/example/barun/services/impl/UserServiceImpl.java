@@ -5,7 +5,6 @@ import com.example.barun.domain.UpdateUserDataRequest;
 import com.example.barun.domain.RegisterUserRequest;
 import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.UserRepository;
-import com.example.barun.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements com.example.barun.services.UserService {
     @Autowired
     private UserRepository userRepository;
 
