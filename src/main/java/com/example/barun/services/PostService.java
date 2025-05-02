@@ -1,10 +1,10 @@
 package com.example.barun.services;
 
 import com.example.barun.domain.CreatePostRequest;
+import com.example.barun.domain.PatchPostRequest;
 import com.example.barun.domain.UpdatePostRequest;
 import com.example.barun.domain.dtos.CreatePostRequestDto;
 import com.example.barun.domain.entities.Post;
-import com.example.barun.domain.entities.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ public interface PostService {
     Post updateImage(Long postId, MultipartFile multipartFile) throws IOException;
     Post addImage(Long postId, MultipartFile multipartFile) throws IOException;
     Post updatePost(Long postId, UpdatePostRequest updatePostRequest);
-    Post patchPost(Long postId, CreatePostRequestDto createPostRequestDto);
+    Post patchPost(Long postId, PatchPostRequest patchPostRequest);
     List<Post> getAllPosts();
 
 }

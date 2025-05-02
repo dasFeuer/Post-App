@@ -1,11 +1,9 @@
 package com.example.barun.controllers;
 
 import com.example.barun.domain.CreatePostRequest;
+import com.example.barun.domain.PatchPostRequest;
 import com.example.barun.domain.UpdatePostRequest;
-import com.example.barun.domain.dtos.CreatePostRequestDto;
-import com.example.barun.domain.dtos.PostDto;
-import com.example.barun.domain.dtos.UpdatePostRequestDto;
-import com.example.barun.domain.dtos.UpdateUserDataRequestDto;
+import com.example.barun.domain.dtos.*;
 import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.User;
 import com.example.barun.mappers.PostMapper;
@@ -63,7 +61,7 @@ public class PostControllers {
     }
 
     @GetMapping("/{id}/post")
-    public ResponseEntity<?>findPostById(@PathVariable Long id){
+    public ResponseEntity<PostDto>findPostById(@PathVariable Long id){
 //        User loggedInUser = getAuthenticatedUser();
 //        if(loggedInUser == null){
 //            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -80,10 +78,12 @@ public class PostControllers {
 //        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Optional<Post> posts = postService.getPostById(id);
-        if(posts.isEmpty()){
-            return new ResponseEntity<>("Post not found", HttpStatus.NOT_FOUND);
+        if (posts.isPresent()){
+            PostDto postDto = postMapper.toDto(posts.get());
+            return ResponseEntity.ok(postDto);
+
         }
-        return ResponseEntity.ok(posts.get());
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/getAllPosts")
@@ -229,9 +229,9 @@ public class PostControllers {
 //    }
 
     @PatchMapping("{postId}/patchPost")
-    public ResponseEntity<Post> patchPost(
+    public ResponseEntity<PostDto> patchPost(
             @PathVariable Long postId,
-            @RequestBody CreatePostRequestDto createPostRequestDto)
+            @RequestBody PatchPostRequestDto patchPostRequestDto)
             throws Exception {
         User loggedInUser = getAuthenticatedUser();
         if (loggedInUser == null) {
@@ -241,8 +241,10 @@ public class PostControllers {
         Optional<Post> postById = postService.getPostById(postId);
         if (postById.isPresent()) {
             if (isPostOwnedByUser(postId, loggedInUser)) {
-                Post post = postService.patchPost(postId, createPostRequestDto);
-                return ResponseEntity.status(HttpStatus.ACCEPTED).body(post);
+                PatchPostRequest patchPostRequest = postMapper.toPatchPostRequest(patchPostRequestDto);
+                Post patchedPost = postService.patchPost(postId, patchPostRequest);
+                PostDto patchedPostDto = postMapper.toDto(patchedPost);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(patchedPostDto);
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }

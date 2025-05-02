@@ -1,8 +1,10 @@
 package com.example.barun.mappers;
 
 import com.example.barun.domain.CreatePostRequest;
+import com.example.barun.domain.PatchPostRequest;
 import com.example.barun.domain.UpdatePostRequest;
 import com.example.barun.domain.dtos.CreatePostRequestDto;
+import com.example.barun.domain.dtos.PatchPostRequestDto;
 import com.example.barun.domain.dtos.PostDto;
 import com.example.barun.domain.dtos.UpdatePostRequestDto;
 import com.example.barun.domain.entities.Post;
@@ -19,5 +21,7 @@ public interface PostMapper {
     CreatePostRequest toCreatePostRequest(CreatePostRequestDto dto);
 
     UpdatePostRequest toUpdatePostRequest(UpdatePostRequestDto dto);
+
+    PatchPostRequest toPatchPostRequest(PatchPostRequestDto dto);
 
 }

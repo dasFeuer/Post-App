@@ -1,11 +1,13 @@
 package com.example.barun.services.impl;
 
 import com.example.barun.domain.CreatePostRequest;
+import com.example.barun.domain.PatchPostRequest;
 import com.example.barun.domain.UpdatePostRequest;
 import com.example.barun.domain.dtos.CreatePostRequestDto;
 import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.PostRepository;
+import com.example.barun.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +28,14 @@ public class PostServiceImpl implements com.example.barun.services.PostService {
     private PostRepository postRepository;
 
     @Autowired
-    private UserServiceImpl userServiceImpl;
+    private UserService userService;
 
     @Override
     @Transactional
     public Post createPostByUser(CreatePostRequest createPostRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User author = userServiceImpl.getUserByUsername(username);
+        User author = userService.getUserByUsername(username);
         System.out.println("Username: " + username);
 
         if (!username.isEmpty()) {
@@ -116,15 +118,15 @@ public class PostServiceImpl implements com.example.barun.services.PostService {
 //    }
 
     @Override
-    public Post patchPost(Long postId, CreatePostRequestDto createPostRequestDto) {
+    public Post patchPost(Long postId, PatchPostRequest patchPostRequest) {
         Optional<Post> existingPost = postRepository.findById(postId);
         if(existingPost.isPresent()){
             Post updatedPost = existingPost.get();
-            if(createPostRequestDto.getTitle() != null){
-                updatedPost.setTitle(createPostRequestDto.getTitle());
+            if(patchPostRequest.getTitle() != null){
+                updatedPost.setTitle(patchPostRequest.getTitle());
             }
-            if(createPostRequestDto.getContent() != null){
-                updatedPost.setContent(createPostRequestDto.getContent());
+            if(patchPostRequest.getContent() != null){
+                updatedPost.setContent(patchPostRequest.getContent());
             }
             return postRepository.save(updatedPost);
         }
