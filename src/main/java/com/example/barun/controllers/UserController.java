@@ -150,7 +150,7 @@ public class UserController{
         try {
             // Check if the user already had an image file exists
             if (loggedInUser.getImageData() != null) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Image already added, please update it!");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Image already present, use update image request!");
             }
             User theUser = userService.addUserProfileImage(userId, multipartFile);
             UserProfileResponseDto userProfileResponseDto = new UserProfileResponseDto();

@@ -127,10 +127,17 @@ public class PostControllers {
             return unauthorizedUser();
         }
         Optional<Post> postById = postService.getPostById(postId);
+
+        if(loggedInUser.getImageData() != null){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Image already present, use update image request!");
+        }
         if(postById.isPresent()){
             if(isPostOwnedByUser(postId, loggedInUser)){
                 Post post = postService.addImage(postId, multipartFile);
-                return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+                PostImageResponseDto postImageResponseDto = new PostImageResponseDto();
+                postImageResponseDto.setImageName(post.getPostImageName());
+                postImageResponseDto.setImageType(post.getPostImageType());
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(postImageResponseDto);
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
@@ -141,6 +148,7 @@ public class PostControllers {
     @GetMapping("/{postId}/image")
     public ResponseEntity<byte[]> getImageByPostId(@PathVariable Long postId) {
         User loggedInUser = getAuthenticatedUser();
+
         if(loggedInUser == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -160,7 +168,7 @@ public class PostControllers {
     }
 
     @PutMapping("{postId}/updatePostImage")
-    public ResponseEntity<Post> updateImage(
+    public ResponseEntity<?> updateImage(
             @PathVariable Long postId,
             @RequestPart("file") MultipartFile multipartFile)
             throws IOException {
@@ -170,10 +178,18 @@ public class PostControllers {
         }
 
         Optional<Post> postById = postService.getPostById(postId);
+
+        if (loggedInUser.getImageData() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("First add/upload the image to update it");
+        }
+
         if(postById.isPresent()){
             if(isPostOwnedByUser(postId, loggedInUser)){
                 Post post = postService.updateImage(postId, multipartFile);
-                return new ResponseEntity<>(post, HttpStatus.ACCEPTED);
+                PostImageResponseDto postImageResponseDto = new PostImageResponseDto();
+                postImageResponseDto.setImageName(post.getPostImageName());
+                postImageResponseDto.setImageType(post.getPostImageType());
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(postImageResponseDto);
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
@@ -205,28 +221,6 @@ public class PostControllers {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
  }
-
-//    @PutMapping("{postId}/updatePost")
-//    public ResponseEntity<Post> updatePost(
-//            @PathVariable Long postId,
-//            @RequestBody CreatePostRequestDto createPostRequestDto)
-//            throws Exception {
-//        User loggedInUser = getAuthenticatedUser();
-//        if(loggedInUser == null){
-//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//        }
-//
-//        Optional<Post> postById = postService.getPostById(postId);
-//        if(postById.isPresent()){
-//            if(isPostOwnedByUser(postId, loggedInUser)){
-//                Post post = postService.updatePost(postId, createPostRequestDto);
-//                return ResponseEntity.status(HttpStatus.ACCEPTED).body(post);
-//            } else {
-//                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//            }
-//        }
-//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
 
     @PatchMapping("{postId}/patchPost")
     public ResponseEntity<PostDto> patchPost(
