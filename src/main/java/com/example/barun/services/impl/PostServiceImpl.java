@@ -3,7 +3,6 @@ package com.example.barun.services.impl;
 import com.example.barun.domain.CreatePostRequest;
 import com.example.barun.domain.PatchPostRequest;
 import com.example.barun.domain.UpdatePostRequest;
-import com.example.barun.domain.dtos.CreatePostRequestDto;
 import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.PostRepository;
@@ -60,6 +59,20 @@ public class PostServiceImpl implements com.example.barun.services.PostService {
     @Override
     public List<Post> getAllPosts() {
         return postRepository.findAll();
+    }
+
+    @Override
+    public void deletePostImageById(Long postId) {
+        Optional<Post> existingPostImage = getPostById(postId);
+        if(existingPostImage.isPresent()){
+            Post postImage = existingPostImage.get();
+            postImage.setPostImageData(null);
+            postImage.setPostImageType(null);
+            postImage.setPostImageName(null);
+            postRepository.save(postImage);
+        } else {
+            throw new EntityNotFoundException("Post Image not found!");
+        }
     }
 
     @Override

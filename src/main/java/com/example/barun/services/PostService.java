@@ -22,5 +22,6 @@ public interface PostService {
     Post updatePost(Long postId, UpdatePostRequest updatePostRequest);
     Post patchPost(Long postId, PatchPostRequest patchPostRequest);
     List<Post> getAllPosts();
+    void deletePostImageById(Long postId);
 
 }
