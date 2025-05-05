@@ -5,33 +5,37 @@ import com.example.barun.domain.entities.Comments;
 import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.CommentRepository;
+import com.example.barun.services.CommentService;
+import com.example.barun.services.PostService;
+import com.example.barun.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CommentService {
+public class CommentServiceImpl implements CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
     @Autowired
-    private PostServiceImpl postServiceImpl;
+    private PostService postService;
 
     @Autowired
-    private UserServiceImpl userServiceImpl;
+    private UserService userService;
 
     @Transactional
-    public Comments writeCommentOnUserPost(Long postId, CommentDto commentDto) throws IOException {
+    @Override
+    public Comments writeCommentOnUserPost(Long postId, CommentDto commentDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User existingUser = userServiceImpl.getUserByUsername(username);
-        Optional<Post> existingPost = postServiceImpl.getPostById(postId);
+        User existingUser = userService.getUserByUsername(username);
+        Optional<Post> existingPost = postService.getPostById(postId);
 
         if(existingPost.isPresent()) {
             Post thepost = existingPost.get();
@@ -41,14 +45,16 @@ public class CommentService {
             newComment.setAuthor(existingUser);
             return commentRepository.save(newComment);
         } else {
-            throw new IOException("Post not found!");
+            throw new EntityNotFoundException("Post not found!");
         }
     }
 
+    @Override
     public Optional<Comments> getCommentsById(Long commentId){
         return commentRepository.findById(commentId);
     }
 
+    @Override
     public void deleteCommentById(Long commentId){
         if(commentRepository.existsById(commentId)){
             commentRepository.deleteById(commentId);
@@ -59,6 +65,7 @@ public class CommentService {
 //        commentRepository.deleteAll();
 //    }
 
+    @Override
     public Comments updateComments(Long commentId, CommentDto commentDto){
         Optional<Comments> existingComment = commentRepository.findById(commentId);
         if(existingComment.isPresent()){
@@ -69,12 +76,14 @@ public class CommentService {
         return existingComment.orElseThrow();
     }
 
+    @Override
     public List<Comments> findAllComments() {
         return commentRepository.findAll();
     }
 
+    @Override
     public List<Comments> getCommentsByPostId(Long postId){
-        if(postServiceImpl.getPostById(postId).isEmpty()){
+        if(postService.getPostById(postId).isEmpty()){
             throw new RuntimeException("Post not found");
         }
         return commentRepository.findCommentsByPostId(postId);
