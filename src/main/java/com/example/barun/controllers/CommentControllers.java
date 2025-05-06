@@ -3,9 +3,10 @@ package com.example.barun.controllers;
 import com.example.barun.domain.dtos.CommentDto;
 import com.example.barun.domain.entities.Comments;
 import com.example.barun.domain.entities.User;
-import com.example.barun.services.impl.CommentServiceImpl;
-import com.example.barun.services.impl.PostServiceImpl;
-import com.example.barun.services.impl.UserServiceImpl;
+import com.example.barun.mappers.CommentMapper;
+import com.example.barun.services.CommentService;
+import com.example.barun.services.PostService;
+import com.example.barun.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,23 +23,27 @@ import java.util.Optional;
 public class CommentControllers {
 
     @Autowired
-    private CommentServiceImpl commentServiceImpl;
+    private CommentService commentService;
 
     @Autowired
-    private UserServiceImpl userServiceImpl;
+    private UserService userService;
 
     @Autowired
-    private PostServiceImpl postServiceImpl;
+    private PostService postService;
+
+    @Autowired
+    private CommentMapper commentMapper;
+
 
     private boolean isCommentOwnedByUser(Long commentId, User loggedInUser){
-        Optional<Comments> comments = commentServiceImpl.getCommentsById(commentId);
+        Optional<Comments> comments = commentService.getCommentsById(commentId);
         return comments.isPresent() && comments.get().getAuthor().getId().equals(loggedInUser.getId());
     }
 
     private User getAuthotrizedUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        return userServiceImpl.getUserByUsername(username);
+        return userService.getUserByUsername(username);
     }
 
     private ResponseEntity<?> unauthorizedUser(){
@@ -52,7 +57,7 @@ public class CommentControllers {
             return unauthorizedUser();
         }
         try{
-            Comments comments = commentServiceImpl.writeCommentOnUserPost(postId, commentDto);
+            Comments comments = commentService.writeCommentOnUserPost(postId, commentDto);
             return new ResponseEntity<>(comments, HttpStatus.CREATED);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -66,10 +71,10 @@ public class CommentControllers {
         if(loggedInUser == null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        Optional<Comments> getCommentsById = commentServiceImpl.getCommentsById(commentId);
+        Optional<Comments> getCommentsById = commentService.getCommentsById(commentId);
         if(getCommentsById.isPresent()){
             if (isCommentOwnedByUser(commentId, loggedInUser)) {
-                Comments updatedComments = commentServiceImpl.updateComments(commentId, commentDto);
+                Comments updatedComments = commentService.updateComments(commentId, commentDto);
                 return new ResponseEntity<>(updatedComments, HttpStatus.ACCEPTED);
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -89,10 +94,10 @@ public class CommentControllers {
         if(loggedInUser == null){
             return unauthorizedUser();
         }
-        Optional<Comments> getCommentsById = commentServiceImpl.getCommentsById(commentId);
+        Optional<Comments> getCommentsById = commentService.getCommentsById(commentId);
         if(getCommentsById.isPresent()) {
             if(isCommentOwnedByUser(commentId, loggedInUser)){
-                commentServiceImpl.deleteCommentById(commentId);
+                commentService.deleteCommentById(commentId);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -116,11 +121,13 @@ public class CommentControllers {
 //            }
 //        }
 //        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        Optional<Comments> comments = commentServiceImpl.getCommentsById(commentId);
-        if (comments.isEmpty()) {
+        Optional<Comments> comments = commentService.getCommentsById(commentId);
+        if(comments.isPresent()){
+            CommentDto commentDto = commentMapper.toDto(comments.get());
+            return ResponseEntity.ok(commentDto);
+        } else {
             return new ResponseEntity<>("Comments not found", HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(comments.get());
     }
 
     @GetMapping("/allComments")
@@ -129,13 +136,16 @@ public class CommentControllers {
         if(loggedInUser == null){
             return unauthorizedUser();
         }
-         return ResponseEntity.ok(commentServiceImpl.findAllComments());
+        List<Comments> comments = commentService.findAllComments();
+        List<CommentDto> commentDto = comments.stream().map(comment -> commentMapper.toDto(comment)).toList();
+         return ResponseEntity.ok(commentDto);
     }
 
     @GetMapping("/{postId}/postComments")
     public ResponseEntity<?> getCommentsByPostId(@PathVariable Long postId){
-        List<Comments> comments = commentServiceImpl.getCommentsByPostId(postId);
-        return ResponseEntity.ok(comments);
+        List<Comments> comments = commentService.getCommentsByPostId(postId);
+        List<CommentDto> commentDto = comments.stream().map(comment -> commentMapper.toDto(comment)).toList();
+        return ResponseEntity.ok(commentDto);
 
     }
 }
