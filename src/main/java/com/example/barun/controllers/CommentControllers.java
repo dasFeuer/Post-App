@@ -1,7 +1,12 @@
 package com.example.barun.controllers;
 
+import com.example.barun.domain.CreateCommentRequest;
+import com.example.barun.domain.UpdateCommentRequest;
 import com.example.barun.domain.dtos.CommentDto;
+import com.example.barun.domain.dtos.CreateCommentRequestDto;
+import com.example.barun.domain.dtos.UpdateCommentRequestDto;
 import com.example.barun.domain.entities.Comments;
+import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.User;
 import com.example.barun.mappers.CommentMapper;
 import com.example.barun.services.CommentService;
@@ -51,22 +56,24 @@ public class CommentControllers {
     }
 
     @PostMapping("/{postId}/writeComment")
-    public ResponseEntity<?> createComment(@PathVariable Long postId, @RequestBody CommentDto commentDto) throws IOException {
+    public ResponseEntity<CommentDto> createComment(@PathVariable Long postId, @RequestBody CreateCommentRequestDto createCommentRequestDto)  {
         User loggedInUser = getAuthotrizedUser();
         if(loggedInUser == null){
-            return unauthorizedUser();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         try{
-            Comments comments = commentService.writeCommentOnUserPost(postId, commentDto);
-            return new ResponseEntity<>(comments, HttpStatus.CREATED);
+            CreateCommentRequest createCommentRequest = commentMapper.toCreateCommentRequest(createCommentRequestDto);
+            Comments comments = commentService.writeCommentOnUserPost(postId, createCommentRequest);
+            CommentDto commentDto = commentMapper.toDto(comments);
+            return new ResponseEntity<>(commentDto, HttpStatus.CREATED);
         }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @PutMapping("/{commentId}/updateComment")
-    public ResponseEntity<Comments> updateComment( @PathVariable Long commentId,
-                                                   @RequestBody CommentDto commentDto){
+    public ResponseEntity<CommentDto> updateComment( @PathVariable Long commentId,
+                                                   @RequestBody UpdateCommentRequestDto updateCommentRequestDto){
         User loggedInUser = getAuthotrizedUser();
         if(loggedInUser == null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -74,8 +81,10 @@ public class CommentControllers {
         Optional<Comments> getCommentsById = commentService.getCommentsById(commentId);
         if(getCommentsById.isPresent()){
             if (isCommentOwnedByUser(commentId, loggedInUser)) {
-                Comments updatedComments = commentService.updateComments(commentId, commentDto);
-                return new ResponseEntity<>(updatedComments, HttpStatus.ACCEPTED);
+                UpdateCommentRequest updateCommentRequest = commentMapper.toUpdateCommentRequest(updateCommentRequestDto);
+                Comments updatedComments = commentService.updateComments(commentId, updateCommentRequest);
+                CommentDto commentDto = commentMapper.toDto(updatedComments);
+                return new ResponseEntity<>(commentDto, HttpStatus.ACCEPTED);
             } else {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }

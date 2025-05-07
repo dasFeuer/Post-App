@@ -1,6 +1,7 @@
 package com.example.barun.services.impl;
 
-import com.example.barun.domain.dtos.CommentDto;
+import com.example.barun.domain.CreateCommentRequest;
+import com.example.barun.domain.UpdateCommentRequest;
 import com.example.barun.domain.entities.Comments;
 import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.User;
@@ -31,7 +32,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public Comments writeCommentOnUserPost(Long postId, CommentDto commentDto) {
+    public Comments writeCommentOnUserPost(Long postId, CreateCommentRequest createCommentRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User existingUser = userService.getUserByUsername(username);
@@ -40,7 +41,8 @@ public class CommentServiceImpl implements CommentService {
         if(existingPost.isPresent()) {
             Post thepost = existingPost.get();
             Comments newComment = new Comments();
-            newComment.setComment(commentDto.getComment());
+            String comment = createCommentRequest.getComment();
+            newComment.setComment(comment);
             newComment.setPost(thepost);
             newComment.setAuthor(existingUser);
             return commentRepository.save(newComment);
@@ -66,11 +68,12 @@ public class CommentServiceImpl implements CommentService {
 //    }
 
     @Override
-    public Comments updateComments(Long commentId, CommentDto commentDto){
+    public Comments updateComments(Long commentId, UpdateCommentRequest updateCommentRequest){
         Optional<Comments> existingComment = commentRepository.findById(commentId);
         if(existingComment.isPresent()){
             Comments updateComments = existingComment.get();
-            updateComments.setComment(commentDto.getComment());
+            String comment = updateCommentRequest.getComment();
+            updateComments.setComment(comment);
             commentRepository.save(updateComments);
         }
         return existingComment.orElseThrow();
