@@ -4,6 +4,10 @@ import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.PostLike;
 import com.example.barun.domain.entities.User;
 import com.example.barun.repositories.PostLikeRepository;
+import com.example.barun.services.PostLikeService;
+import com.example.barun.services.PostService;
+import com.example.barun.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -11,34 +15,34 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class LikeService {
+public class PostLikeServiceImpl implements PostLikeService {
     @Autowired
     private PostLikeRepository likeRepository;
 
     @Autowired
-    private UserServiceImpl userServiceImpl;
+    private UserService userService;
 
     @Autowired
-    private PostServiceImpl postServiceImpl;
+    private PostService postService;
 
     @Transactional
-    public boolean toggleLike(Long postId) throws IOException {
+    @Override
+    public boolean toggleLike(Long postId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User loggedInUser = userServiceImpl.getUserByUsername(username);
+        User loggedInUser = userService.getUserByUsername(username);
 
         if(loggedInUser == null){
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
 
-        Optional<Post> optionalPost = postServiceImpl.getPostById(postId);
+        Optional<Post> optionalPost = postService.getPostById(postId);
         if(optionalPost.isEmpty()){
-            throw new IOException("Post not found with Id: " + postId);
+            throw new EntityNotFoundException("Post not found with Id: " + postId);
         }
 
         Post post = optionalPost.get();
@@ -58,14 +62,17 @@ public class LikeService {
         }
     }
 
+    @Override
     public boolean hasUserLikedThePost(Long userId, Long postId){
         return likeRepository.existsByUserIdAndPostId(userId, postId);
     }
 
+    @Override
     public int getLikeCountForPost(Long postId){
         return likeRepository.countByPostId(postId);
     }
 
+    @Override
     public List<PostLike> getLikesForPost(Long postId){
         return likeRepository.findByPostId(postId);
     }
