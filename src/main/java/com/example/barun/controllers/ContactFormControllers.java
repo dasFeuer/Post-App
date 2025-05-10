@@ -1,7 +1,8 @@
 package com.example.barun.controllers;
 
+import com.example.barun.domain.dtos.EmailBodyDto;
 import com.example.barun.domain.entities.ContactForm;
-import com.example.barun.services.impl.ContactFormService;
+import com.example.barun.services.impl.ContactFormServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -16,19 +17,22 @@ import java.util.Optional;
 public class ContactFormControllers {
 
     @Autowired
-    private ContactFormService formService;
+    private ContactFormServiceImpl formService;
 
     @Value("${contactForm.recipient.email}")
     private String recipientEmail;
 
     @PostMapping("/sendForm")
     public String sendContactForm(@RequestBody ContactForm contactForm){
-        String subject = "You got a new message from: " + contactForm.getFullName();
-        String body = "Name: " + contactForm.getFullName() + "\n" +
-                      "Email: " + contactForm.getEmail() + "\n" +
-                      "Message: " + contactForm.getMessage();
-
-        formService.sendEmailOfContactForm(recipientEmail, subject, body, contactForm);
+        EmailBodyDto emailBodyDto = new EmailBodyDto(
+                recipientEmail,
+                "You got a new message from: " + contactForm.getFullName(),
+                "Name: " + contactForm.getFullName() + "\n" +
+                        "Email: " + contactForm.getEmail() + "\n" +
+                        "Message: " + contactForm.getMessage(),
+                contactForm
+        );
+        formService.sendEmailOfContactForm(emailBodyDto);
         return "Mail received";
     }
 
