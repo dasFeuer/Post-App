@@ -1,7 +1,9 @@
 package com.example.barun.controllers;
 
+import com.example.barun.domain.dtos.ContactFormDto;
 import com.example.barun.domain.dtos.EmailBodyDto;
 import com.example.barun.domain.entities.ContactForm;
+import com.example.barun.mappers.ContactFormMapper;
 import com.example.barun.services.impl.ContactFormServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +20,9 @@ public class ContactFormControllers {
 
     @Autowired
     private ContactFormServiceImpl formService;
+
+    @Autowired
+    private ContactFormMapper contactFormMapper;
 
     @Value("${contactForm.recipient.email}")
     private String recipientEmail;
@@ -37,8 +42,15 @@ public class ContactFormControllers {
     }
 
     @GetMapping("/allForms")
-    public List<ContactForm> allContactForms(){
-        return formService.getAllContactForm();
+    public List<ContactFormDto> allContactForms(){
+        List<ContactForm> allContactForms = formService.getAllContactForm();
+        if(allContactForms.isEmpty()){
+            return List.of();
+        }
+        return allContactForms.
+                stream().
+                map(contactFormMapper::toDto).
+                toList();
     }
 
     @DeleteMapping("/deleteAllForms")
@@ -48,10 +60,13 @@ public class ContactFormControllers {
     }
 
     @GetMapping("/{id}/form")
-    public ResponseEntity<ContactForm> findById(@PathVariable Long id){
+    public ResponseEntity<ContactFormDto> findById(@PathVariable Long id){
         Optional<ContactForm> byId = formService.getById(id);
-        return byId.map(ResponseEntity::ok)
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        if(byId.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        ContactFormDto contactFormDto = contactFormMapper.toDto(byId.get());
+        return ResponseEntity.ok(contactFormDto);
     }
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
