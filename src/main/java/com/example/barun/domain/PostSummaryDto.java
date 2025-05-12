@@ -1,14 +1,14 @@
-package com.example.barun.domain.dtos;
+package com.example.barun.domain;
 
+import com.example.barun.domain.dtos.AuthorDto;
 import com.example.barun.domain.entities.Comments;
 import com.example.barun.domain.entities.PostLike;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-public class PostDto {
+public class PostSummaryDto {
 
     private Long id;
     private String title;
@@ -20,22 +20,18 @@ public class PostDto {
     private String postImageName;
     private List<Comments> comments = new ArrayList<>();
     private List<PostLike> likes = new ArrayList<>();
-    private Date createdAt;
-    private Date updatedAt;
 
-    public PostDto() {
+    public PostSummaryDto() {
     }
 
-    public PostDto(Long id,
-                   String title,
-                   String content, AuthorDto author,
-                   byte[] postImageData,
-                   String postImageType,
-                   String postImageName,
-                   List<Comments> comments,
-                   List<PostLike> likes,
-                   Date createdAt,
-                   Date updatedAt) {
+    public PostSummaryDto(Long id,
+                          String title,
+                          String content, AuthorDto author,
+                          byte[] postImageData,
+                          String postImageType,
+                          String postImageName,
+                          List<Comments> comments,
+                          List<PostLike> likes) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -45,8 +41,6 @@ public class PostDto {
         this.postImageName = postImageName;
         this.comments = comments;
         this.likes = likes;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public Long getId() {
@@ -119,21 +113,5 @@ public class PostDto {
 
     public void setLikes(List<PostLike> likes) {
         this.likes = likes;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

@@ -96,14 +96,7 @@ public class UserController{
         }
         try{
            List<User> allUsers = userService.getAllUsers();
-           List<UserSummaryDto> userDtos = allUsers.stream()
-                   .map(user -> { UserSummaryDto dto = new UserSummaryDto();
-                            dto.setId(user.getId());
-                            dto.setFullName(user.getFullName());
-                            dto.setUsername(user.getUsername());
-                            dto.setEmail(user.getEmail());
-                            return dto;
-                   }).toList();
+           List<UserSummaryDto> userDtos = allUsers.stream().map(userMapper::toSummaryDto).toList();
             return ResponseEntity.ok(userDtos);
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -111,17 +104,17 @@ public class UserController{
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<UserDto> getUserById(@PathVariable Long id){
+    private ResponseEntity<UserSummaryDto> getUserById(@PathVariable Long id){
         User loggedInUser = getAuthenticatedUser();
         if(loggedInUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
             try{
                 User user = userService.getUserById(id);
-                UserDto userDto = userMapper.toDto(user);
+                UserSummaryDto userSummaryDto = userMapper.toSummaryDto(user);
                 // Ternary operator-> conditions ? valueIfTure : valueIfFalse --> Can be used to handling the null check
                 return user != null
-                        ? ResponseEntity.ok(userDto)
+                        ? ResponseEntity.ok(userSummaryDto)
                         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
 //                if(user != null){
 //                    return new ResponseEntity<>(user, HttpStatus.FOUND);
@@ -153,9 +146,7 @@ public class UserController{
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Image already present, use update image request!");
             }
             User theUser = userService.addUserProfileImage(userId, multipartFile);
-            UserProfileResponseDto userProfileResponseDto = new UserProfileResponseDto();
-            userProfileResponseDto.setImageType(theUser.getImageType());
-            userProfileResponseDto.setImageName(theUser.getImageName());
+            UserProfileResponseDto userProfileResponseDto = userMapper.toProfileResponseDto(theUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(userProfileResponseDto);
         } catch (IOException exception) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -179,9 +170,7 @@ public class UserController{
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("First add/upload the image to update it");
                 }
                 User theUser = userService.updateImage(userId, multipartFile);
-                UserProfileResponseDto userProfileResponseDto = new UserProfileResponseDto();
-                userProfileResponseDto.setImageType(theUser.getImageType());
-                userProfileResponseDto.setImageName(theUser.getImageName());
+                UserProfileResponseDto userProfileResponseDto = userMapper.toProfileResponseDto(theUser);
                 return ResponseEntity.status(HttpStatus.CREATED).body(userProfileResponseDto);
             } catch (Exception exception){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -294,12 +283,7 @@ public class UserController{
         }
             try{
                 User user = userService.getUserByUsername(userUsername);
-                UserSummaryDto userByUsername= new UserSummaryDto();
-                userByUsername.setId(user.getId());
-                userByUsername.setUsername(user.getUsername());
-                userByUsername.setFullName(user.getFullName());
-                userByUsername.setEmail(user.getEmail());
-
+                UserSummaryDto userByUsername = userMapper.toSummaryDto(user);
 //                return new ResponseEntity<>(userByUsername, HttpStatus.OK);
                 return ResponseEntity.ok(userByUsername);
             } catch (Exception e){

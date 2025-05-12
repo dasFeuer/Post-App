@@ -3,6 +3,7 @@ package com.example.barun.domain.dtos;
 import com.example.barun.domain.entities.Comments;
 import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.PostLike;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.List;
 
 public class UserDto {
     private Long id;
+    @JsonIgnore
     private byte[] imageData;
     private String imageType;
     private String imageName;
