@@ -6,7 +6,6 @@ import com.example.barun.domain.dtos.CommentDto;
 import com.example.barun.domain.dtos.CreateCommentRequestDto;
 import com.example.barun.domain.dtos.UpdateCommentRequestDto;
 import com.example.barun.domain.entities.Comments;
-import com.example.barun.domain.entities.Post;
 import com.example.barun.domain.entities.User;
 import com.example.barun.mappers.CommentMapper;
 import com.example.barun.services.CommentService;
@@ -19,7 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
