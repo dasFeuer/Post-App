@@ -2,18 +2,16 @@ package com.example.barun.domain.dtos;
 
 import com.example.barun.domain.PostSummaryDto;
 import com.example.barun.domain.UserSummaryDto;
-import com.example.barun.domain.entities.Post;
-import com.example.barun.domain.entities.User;
 
-public class PostLikeDto {
+public class PostLikeSummaryDto {
     private Long id;
     private UserSummaryDto user;
     private PostSummaryDto post;
 
-    public PostLikeDto() {
+    public PostLikeSummaryDto() {
     }
 
-    public PostLikeDto(Long id, UserSummaryDto user, PostSummaryDto post) {
+    public PostLikeSummaryDto(Long id, UserSummaryDto user, PostSummaryDto post) {
         this.id = id;
         this.user = user;
         this.post = post;

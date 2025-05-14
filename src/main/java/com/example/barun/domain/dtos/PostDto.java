@@ -1,7 +1,6 @@
 package com.example.barun.domain.dtos;
 
-import com.example.barun.domain.entities.Comments;
-import com.example.barun.domain.entities.PostLike;
+import com.example.barun.domain.CommentSummaryDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
@@ -18,13 +17,14 @@ public class PostDto {
     private byte[] postImageData;
     private String postImageType;
     private String postImageName;
-    private List<Comments> comments = new ArrayList<>();
-    private List<PostLike> likes = new ArrayList<>();
+    private List<CommentSummaryDto> comments = new ArrayList<>();
+    private List<PostLikeSummaryDto> likes = new ArrayList<>();
     private Date createdAt;
     private Date updatedAt;
 
     public PostDto() {
     }
+
 
     public PostDto(Long id,
                    String title,
@@ -32,8 +32,8 @@ public class PostDto {
                    byte[] postImageData,
                    String postImageType,
                    String postImageName,
-                   List<Comments> comments,
-                   List<PostLike> likes,
+                   List<CommentSummaryDto> comments,
+                   List<PostLikeSummaryDto> likes,
                    Date createdAt,
                    Date updatedAt) {
         this.id = id;
@@ -44,7 +44,7 @@ public class PostDto {
         this.postImageType = postImageType;
         this.postImageName = postImageName;
         this.comments = comments;
-        this.likes = likes;
+
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -105,20 +105,21 @@ public class PostDto {
         this.postImageName = postImageName;
     }
 
-    public List<Comments> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comments> comments) {
-        this.comments = comments;
-    }
-
-    public List<PostLike> getLikes() {
+    public List<PostLikeSummaryDto> getLikes() {
         return likes;
     }
 
-    public void setLikes(List<PostLike> likes) {
+    public void setLikes(List<PostLikeSummaryDto> likes) {
         this.likes = likes;
+    }
+
+    public List<CommentSummaryDto> getComments() {
+        return comments;
+    }
+
+
+    public void setComments(List<CommentSummaryDto> comments) {
+        this.comments = comments;
     }
 
     public Date getCreatedAt() {
