@@ -6,15 +6,13 @@ import com.example.barun.domain.UserSummaryDto;
 public class PostLikeSummaryDto {
     private Long id;
     private UserSummaryDto user;
-    private PostSummaryDto post;
 
     public PostLikeSummaryDto() {
     }
 
-    public PostLikeSummaryDto(Long id, UserSummaryDto user, PostSummaryDto post) {
+    public PostLikeSummaryDto(Long id, UserSummaryDto user) {
         this.id = id;
         this.user = user;
-        this.post = post;
     }
 
     public Long getId() {
@@ -31,13 +29,5 @@ public class PostLikeSummaryDto {
 
     public void setUser(UserSummaryDto user) {
         this.user = user;
-    }
-
-    public PostSummaryDto getPost() {
-        return post;
-    }
-
-    public void setPost(PostSummaryDto post) {
-        this.post = post;
     }
 }

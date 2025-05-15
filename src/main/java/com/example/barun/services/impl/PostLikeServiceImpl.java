@@ -56,7 +56,9 @@ public class PostLikeServiceImpl implements PostLikeService {
             return false; // -- Post Was UnLike
         } else {
             // If the like doesn't exist by a user, then create it (like)
-            PostLike newLike = new PostLike(loggedInUser, post);
+            PostLike newLike = new PostLike();
+            newLike.setUser(loggedInUser);
+            newLike.setPost(post);
             likeRepository.save(newLike);
             return true; // Post was liked
         }
