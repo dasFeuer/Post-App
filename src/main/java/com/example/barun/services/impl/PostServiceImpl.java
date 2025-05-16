@@ -146,4 +146,13 @@ public class PostServiceImpl implements PostService {
         }
         throw new EntityNotFoundException("Post not found");
     }
+
+    @Override
+    public Post getUserPostByAuthorUsername(String username) {
+        if(!username.isEmpty()) {
+            return postRepository.findUserPostByAuthorUsername(username);
+        } else {
+            throw new EntityNotFoundException("User not found with username: " + username);
+        }
+    }
 }

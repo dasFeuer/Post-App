@@ -247,4 +247,22 @@ public class PostControllers {
         }
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @GetMapping("/getUserPostByAuthorUsername/{username}")
+    public ResponseEntity<PostDto> getUserPostByUsername(@PathVariable String username){
+        User loggedInUser = getAuthenticatedUser();
+        if(loggedInUser == null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if(!loggedInUser.getPosts().isEmpty()){
+            if(loggedInUser.getUsername().equals(username)){
+                Post postByUsername = postService.getUserPostByAuthorUsername(username);
+                PostDto postDto = postMapper.toDto(postByUsername);
+                return ResponseEntity.ok(postDto);
+            }
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

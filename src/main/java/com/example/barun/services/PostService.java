@@ -23,5 +23,6 @@ public interface PostService {
     Post patchPost(Long postId, PatchPostRequest patchPostRequest);
     List<Post> getAllPosts();
     void deletePostImageById(Long postId);
+    Post getUserPostByAuthorUsername(String username);
 
 }
