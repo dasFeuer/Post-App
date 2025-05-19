@@ -41,10 +41,10 @@ public class PostControllers {
         return post.isPresent() && post.get().getAuthor().getId().equals(user.getId());
     }
 
-    private User getAuthenticatedUser(){
+    private Optional<User> getAuthenticatedUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        return userService.getUserByUsername(username);
+        String email = authentication.getName();
+        return userService.getUserByEmail(email);
     }
 
     private ResponseEntity<String> unauthorizedUser(){
@@ -73,8 +73,8 @@ public class PostControllers {
 
     @GetMapping("/getAllPosts")
     public ResponseEntity<List<PostDto>> findAllPost(){
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null){
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         List<Post> posts = postService.getAllPosts();
@@ -84,13 +84,13 @@ public class PostControllers {
 
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<?> deletePostById(@PathVariable Long id){
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null){
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         Optional<Post> postById = postService.getPostById(id);
         if(postById.isPresent()){
-            if (isPostOwnedByUser(id, loggedInUser)){
+            if (isPostOwnedByUser(id, loggedInUser.get())){
                 postService.deletePostById(id);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
@@ -104,8 +104,8 @@ public class PostControllers {
     public ResponseEntity<?> addImage(@PathVariable Long postId,
                                          @RequestPart("file")MultipartFile multipartFile)
             throws IOException {
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null){
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()){
             return unauthorizedUser();
         }
         Optional<Post> postById = postService.getPostById(postId);
@@ -116,7 +116,7 @@ public class PostControllers {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Image already present, use update image request!");
             }
 
-            if(isPostOwnedByUser(postId, loggedInUser)){
+            if(isPostOwnedByUser(postId, loggedInUser.get())){
                 Post post = postService.addImage(postId, multipartFile);
                 PostImageResponseDto postImageResponseDto = new PostImageResponseDto();
                 postImageResponseDto.setImageName(post.getPostImageName());
@@ -131,15 +131,15 @@ public class PostControllers {
 
     @GetMapping("/{postId}/image")
     public ResponseEntity<byte[]> getImageByPostId(@PathVariable Long postId) {
-        User loggedInUser = getAuthenticatedUser();
+        Optional<User> loggedInUser = getAuthenticatedUser();
 
-        if(loggedInUser == null){
+        if(loggedInUser.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         Optional<Post> post = postService.getPostById(postId);
         if(post.isPresent()){
-            if(isPostOwnedByUser(postId, loggedInUser)){
+            if(isPostOwnedByUser(postId, loggedInUser.get())){
                 byte[] postImageFile = post.get().getPostImageData(); //--> Yes Optional<Post> = post.get().getImageData()
                 return ResponseEntity.ok()
                         .contentType(MediaType.valueOf(post.get().getPostImageType()))
@@ -156,8 +156,8 @@ public class PostControllers {
             @PathVariable Long postId,
             @RequestPart("file") MultipartFile multipartFile)
             throws IOException {
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null){
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -169,7 +169,7 @@ public class PostControllers {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("First add/upload the image to update it");
             }
 
-            if(isPostOwnedByUser(postId, loggedInUser)){
+            if(isPostOwnedByUser(postId, loggedInUser.get())){
                 Post post = postService.updateImage(postId, multipartFile);
                 PostImageResponseDto postImageResponseDto = new PostImageResponseDto();
                 postImageResponseDto.setImageName(post.getPostImageName());
@@ -187,14 +187,14 @@ public class PostControllers {
     public ResponseEntity<PostDto> updatePost(
             @PathVariable Long postId,
             @Valid @RequestBody UpdatePostRequestDto updatePostRequestDto) {
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null){
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         Optional<Post> postById = postService.getPostById(postId);
         if(postById.isPresent()){
-            if(isPostOwnedByUser(postId, loggedInUser)){
+            if(isPostOwnedByUser(postId, loggedInUser.get())){
                 UpdatePostRequest updatePostRequest = postMapper.toUpdatePostRequest(updatePostRequestDto);
                 Post updatedPost = postService.updatePost(postId, updatePostRequest);
                 PostDto updatedPostDto = postMapper.toDto(updatedPost);
@@ -210,14 +210,14 @@ public class PostControllers {
     public ResponseEntity<PostDto> patchPost(
             @PathVariable Long postId,
             @RequestBody PatchPostRequestDto patchPostRequestDto) {
-        User loggedInUser = getAuthenticatedUser();
-        if (loggedInUser == null) {
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if (loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         Optional<Post> postById = postService.getPostById(postId);
         if (postById.isPresent()) {
-            if (isPostOwnedByUser(postId, loggedInUser)) {
+            if (isPostOwnedByUser(postId, loggedInUser.get())) {
                 PatchPostRequest patchPostRequest = postMapper.toPatchPostRequest(patchPostRequestDto);
                 Post patchedPost = postService.patchPost(postId, patchPostRequest);
                 PostDto patchedPostDto = postMapper.toDto(patchedPost);
@@ -231,16 +231,16 @@ public class PostControllers {
 
     @DeleteMapping("/{id}/deletePostImage")
     public ResponseEntity<Void> deletePostImageById(@PathVariable Long id){
-        User loggedInUser = getAuthenticatedUser();
+        Optional<User> loggedInUser = getAuthenticatedUser();
 
-        if(loggedInUser == null) {
+        if(loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         Optional<Post> post = postService.getPostById(id);
 
         if(post.isPresent()){
-            if(isPostOwnedByUser(id, loggedInUser)){
+            if(isPostOwnedByUser(id, loggedInUser.get())){
                 postService.deletePostImageById(id);
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -250,13 +250,13 @@ public class PostControllers {
 
     @GetMapping("/getUserPostByAuthorUsername/{username}")
     public ResponseEntity<PostDto> getUserPostByUsername(@PathVariable String username){
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null){
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        if(!loggedInUser.getPosts().isEmpty()){
-            if(loggedInUser.getUsername().equals(username)){
+        if(!loggedInUser.get().getPosts().isEmpty()){
+            if(loggedInUser.get().getUsername().equals(username)){
                 Post postByUsername = postService.getUserPostByAuthorUsername(username);
                 PostDto postDto = postMapper.toDto(postByUsername);
                 return ResponseEntity.ok(postDto);

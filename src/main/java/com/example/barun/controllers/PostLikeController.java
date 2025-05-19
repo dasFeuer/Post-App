@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/likes")
@@ -55,10 +56,13 @@ public class PostLikeController {
         try {
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String username = authentication.getName();
-            User currentUser = userService.getUserByUsername(username);
+            String email = authentication.getName();
+            Optional<User> currentUser = userService.getUserByEmail(email);
+            if (currentUser.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
 
-            boolean isLiked = postLikeService.hasUserLikedThePost(currentUser.getId(), postId);
+            boolean isLiked = postLikeService.hasUserLikedThePost(currentUser.get().getId(), postId);
             int likeCount = postLikeService.getLikeCountForPost(postId);
 
             LikeResponseDto response = new LikeResponseDto();

@@ -34,20 +34,21 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public Post createPostByUser(CreatePostRequest createPostRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User author = userService.getUserByUsername(username);
-        System.out.println("Username: " + username);
+        String email = authentication.getName();
+        Optional<User> author = userService.getUserByEmail(email);
+        System.out.println("Email: " + email);
 
-        if (!username.isEmpty()) {
-            Post newPost = new Post();
-            newPost.setTitle(createPostRequest.getTitle());
-            newPost.setContent(createPostRequest.getContent());
-            newPost.setAuthor(author);
+        if (!email.isEmpty()) {
+            if (author.isPresent()) {
+                Post newPost = new Post();
+                newPost.setTitle(createPostRequest.getTitle());
+                newPost.setContent(createPostRequest.getContent());
+                newPost.setAuthor(author.get());
 
-            return postRepository.save(newPost);
-        } else {
-            throw new UsernameNotFoundException("User not found with username: " + username);
+                return postRepository.save(newPost);
+            }
         }
+        throw new UsernameNotFoundException("User not found with email: " + email);
     }
 
 

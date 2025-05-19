@@ -34,20 +34,24 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comments writeCommentOnUserPost(Long postId, CreateCommentRequest createCommentRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User existingUser = userService.getUserByUsername(username);
+        String email = authentication.getName();
+        Optional<User> existingUser = userService.getUserByEmail(email);
         Optional<Post> existingPost = postService.getPostById(postId);
 
-        if(existingPost.isPresent()) {
-            Post thepost = existingPost.get();
-            Comments newComment = new Comments();
-            String comment = createCommentRequest.getComment();
-            newComment.setComment(comment);
-            newComment.setPost(thepost);
-            newComment.setAuthor(existingUser);
-            return commentRepository.save(newComment);
+        if(existingUser.isPresent()) {
+            if (existingPost.isPresent()) {
+                Post thepost = existingPost.get();
+                Comments newComment = new Comments();
+                String comment = createCommentRequest.getComment();
+                newComment.setComment(comment);
+                newComment.setPost(thepost);
+                newComment.setAuthor(existingUser.get());
+                return commentRepository.save(newComment);
+            } else {
+                throw new EntityNotFoundException("Post not found!");
+            }
         } else {
-            throw new EntityNotFoundException("Post not found!");
+            throw new EntityNotFoundException("User not found!");
         }
     }
 

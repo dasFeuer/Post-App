@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -44,10 +45,10 @@ public class UserController{
     @Autowired
     private UserMapper userMapper;;
 
-    private User getAuthenticatedUser(){
+    private Optional<User> getAuthenticatedUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        return userService.getUserByUsername(username);
+        String email = authentication.getName();
+        return userService.getUserByEmail(email);
     }
 
     private ResponseEntity<String> unauthorized(){
@@ -67,7 +68,7 @@ public class UserController{
     private ResponseEntity<AuthResponse> loginUser(@RequestBody LoginUserRequest loginUserRequest){
         Authentication authentication = authenticationManager.authenticate
                 (new UsernamePasswordAuthenticationToken(
-                loginUserRequest.getUsername(),
+                loginUserRequest.getEmail(),
                 loginUserRequest.getPassword()
         )
                 );
@@ -90,8 +91,8 @@ public class UserController{
 
     @GetMapping("/allUsers")
     private ResponseEntity<List<UserSummaryDto>> getAllUsers(){
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null) {
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         try{
@@ -105,8 +106,8 @@ public class UserController{
 
     @GetMapping("/{id}")
     private ResponseEntity<UserSummaryDto> getUserById(@PathVariable Long id){
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null) {
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
             try{
@@ -131,18 +132,18 @@ public class UserController{
     public ResponseEntity<?> addUserImage(
             @PathVariable("id") Long userId,
             @RequestPart("file") MultipartFile multipartFile) {
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null) {
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        if(!loggedInUser.getId().equals(userId)){
+        if(!loggedInUser.get().getId().equals(userId)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         try {
             // Check if the user already had an image file exists
-            if (loggedInUser.getImageData() != null) {
+            if (loggedInUser.get().getImageData() != null) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Image already present, use update image request!");
             }
             User theUser = userService.addUserProfileImage(userId, multipartFile);
@@ -156,17 +157,17 @@ public class UserController{
     @PutMapping("/{id}/updateImage")
     private ResponseEntity<?> updateImage(@PathVariable("id") Long userId,
                                            @RequestPart("file")MultipartFile multipartFile) {
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null) {
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        if(!loggedInUser.getId().equals(userId)) {
+        if(!loggedInUser.get().getId().equals(userId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
             try {
-                if (loggedInUser.getImageData() == null) {
+                if (loggedInUser.get().getImageData() == null) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("First add/upload the image to update it");
                 }
                 User theUser = userService.updateImage(userId, multipartFile);
@@ -197,12 +198,12 @@ public class UserController{
     @PatchMapping("/{id}/patchData")
     public ResponseEntity<UserDto> patchUserData(@PathVariable Long id,
                                                  @RequestBody PatchUserDataRequestDto patchUserDataRequestDto) throws IOException {
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null) {
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        if(!loggedInUser.getId().equals(id)){
+        if(!loggedInUser.get().getId().equals(id)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -220,11 +221,11 @@ public class UserController{
     public ResponseEntity<UserDto> updateUserData(@PathVariable Long id,
                                                   @Valid @RequestBody UpdateUserDataRequestDto updateUserDataRequestDto)
             throws IOException {
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null) {
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        if(!loggedInUser.getId().equals(id)){
+        if(!loggedInUser.get().getId().equals(id)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
             try{
@@ -239,12 +240,12 @@ public class UserController{
 
     @DeleteMapping("/{id}/deleteUser")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null) {
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        if(!loggedInUser.getId().equals(id)){
+        if(!loggedInUser.get().getId().equals(id)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -258,12 +259,12 @@ public class UserController{
 
     @DeleteMapping("/{id}/deleteUserImage")
     public ResponseEntity<Void> deleteUserImage(@PathVariable Long id){
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null) {
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        if(!loggedInUser.getId().equals(id)){
+        if(!loggedInUser.get().getId().equals(id)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -277,8 +278,8 @@ public class UserController{
 
     @GetMapping("/{userUsername}/username")
     public ResponseEntity<UserSummaryDto> getByUsername(@PathVariable String userUsername){
-        User loggedInUser = getAuthenticatedUser();
-        if(loggedInUser == null) {
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
             try{
@@ -290,4 +291,31 @@ public class UserController{
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
+
+    @GetMapping("/email")
+    public ResponseEntity<UserSummaryDto> getByEmail(@RequestParam("email") String email){
+        Optional<User> loggedInUser = getAuthenticatedUser();
+        if(loggedInUser.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+//        if(!loggedInUser.get().getEmail().equals(email)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
+
+        if(!loggedInUser.get().getEmail().equals(email)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+            try{
+                Optional<User> user = userService.getUserByEmail(email);
+                if(user.isEmpty()){
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+                UserSummaryDto userByEmail = userMapper.toSummaryDto(user.get());
+                return ResponseEntity.ok(userByEmail);
+            } catch (Exception e){
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
 }

@@ -33,11 +33,11 @@ public class PostLikeServiceImpl implements PostLikeService {
     @Override
     public boolean toggleLike(Long postId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User loggedInUser = userService.getUserByUsername(username);
+        String email = authentication.getName();
+        Optional<User> loggedInUser = userService.getUserByEmail(email);
 
-        if(loggedInUser == null){
-            throw new UsernameNotFoundException("User not found with username: " + username);
+        if(loggedInUser.isEmpty()){
+            throw new UsernameNotFoundException("User not found with username: " + email);
         }
 
         Optional<Post> optionalPost = postService.getPostById(postId);
@@ -48,7 +48,7 @@ public class PostLikeServiceImpl implements PostLikeService {
         Post post = optionalPost.get();
 
         // Checking if a user had already liked the post
-        Optional<PostLike> existingLike = likeRepository.findByUserIdAndPostId(loggedInUser.getId(), postId);
+        Optional<PostLike> existingLike = likeRepository.findByUserIdAndPostId(loggedInUser.get().getId(), postId);
 
         // If the like exists by user then remove it i.e. unlike
         if(existingLike.isPresent()){
@@ -57,7 +57,7 @@ public class PostLikeServiceImpl implements PostLikeService {
         } else {
             // If the like doesn't exist by a user, then create it (like)
             PostLike newLike = new PostLike();
-            newLike.setUser(loggedInUser);
+            newLike.setUser(loggedInUser.get());
             newLike.setPost(post);
             likeRepository.save(newLike);
             return true; // Post was liked

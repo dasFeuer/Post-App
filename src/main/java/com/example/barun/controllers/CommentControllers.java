@@ -43,10 +43,10 @@ public class CommentControllers {
         return comments.isPresent() && comments.get().getAuthor().getId().equals(loggedInUser.getId());
     }
 
-    private User getAuthotrizedUser(){
+    private Optional<User> getAuthorizedUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        return userService.getUserByUsername(username);
+        String email= authentication.getName();
+        return userService.getUserByEmail(email);
     }
 
     private ResponseEntity<?> unauthorizedUser(){
@@ -55,8 +55,8 @@ public class CommentControllers {
 
     @PostMapping("/{postId}/writeComment")
     public ResponseEntity<CommentDto> createComment(@PathVariable Long postId, @RequestBody CreateCommentRequestDto createCommentRequestDto)  {
-        User loggedInUser = getAuthotrizedUser();
-        if(loggedInUser == null){
+        Optional<User> loggedInUser = getAuthorizedUser();
+        if(loggedInUser.isEmpty()){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         try{
@@ -72,13 +72,13 @@ public class CommentControllers {
     @PutMapping("/{commentId}/updateComment")
     public ResponseEntity<CommentDto> updateComment( @PathVariable Long commentId,
                                                    @RequestBody UpdateCommentRequestDto updateCommentRequestDto){
-        User loggedInUser = getAuthotrizedUser();
-        if(loggedInUser == null){
+        Optional<User> loggedInUser = getAuthorizedUser();
+        if(loggedInUser.isEmpty()){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         Optional<Comments> getCommentsById = commentService.getCommentsById(commentId);
         if(getCommentsById.isPresent()){
-            if (isCommentOwnedByUser(commentId, loggedInUser)) {
+            if (isCommentOwnedByUser(commentId, loggedInUser.get())) {
                 UpdateCommentRequest updateCommentRequest = commentMapper.toUpdateCommentRequest(updateCommentRequestDto);
                 Comments updatedComments = commentService.updateComments(commentId, updateCommentRequest);
                 CommentDto commentDto = commentMapper.toDto(updatedComments);
@@ -97,13 +97,13 @@ public class CommentControllers {
 
     @DeleteMapping("/{commentId}/deleteComment")
     public ResponseEntity<?> deleteCommentsById(@PathVariable Long commentId){
-        User loggedInUser = getAuthotrizedUser();
-        if(loggedInUser == null){
+        Optional<User> loggedInUser = getAuthorizedUser();
+        if(loggedInUser.isEmpty()){
             return unauthorizedUser();
         }
         Optional<Comments> getCommentsById = commentService.getCommentsById(commentId);
         if(getCommentsById.isPresent()) {
-            if(isCommentOwnedByUser(commentId, loggedInUser)){
+            if(isCommentOwnedByUser(commentId, loggedInUser.get())){
                 commentService.deleteCommentById(commentId);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
@@ -139,8 +139,8 @@ public class CommentControllers {
 
     @GetMapping("/allComments")
     public ResponseEntity<?> findAllComments(){
-        User loggedInUser = getAuthotrizedUser();
-        if(loggedInUser == null){
+        Optional<User> loggedInUser = getAuthorizedUser();
+        if(loggedInUser.isEmpty()){
             return unauthorizedUser();
         }
         List<Comments> comments = commentService.findAllComments();
@@ -151,7 +151,7 @@ public class CommentControllers {
     @GetMapping("/{postId}/postComments")
     public ResponseEntity<?> getCommentsByPostId(@PathVariable Long postId){
         List<Comments> comments = commentService.getCommentsByPostId(postId);
-        List<CommentDto> commentDto = comments.stream().map(comment -> commentMapper.toDto(comment)).toList();
+        List<CommentDto> commentDto = comments.stream().map(commentMapper::toDto).toList();
         return ResponseEntity.ok(commentDto);
 
     }

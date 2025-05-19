@@ -8,12 +8,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
 
     User registerTheUser(RegisterUserRequest registerUserRequest);
     List<User> getAllUsers();
     User getUserByUsername(String username);
+    Optional<User> getUserByEmail(String email);
     User updateOrAddTheImage(Long userId, MultipartFile imageFile) throws IOException;
     User updateImage(Long userId, MultipartFile imageFile) throws IOException;
     User addUserProfileImage(Long userId, MultipartFile imageFile) throws IOException;
