@@ -1,7 +1,5 @@
 package com.example.barun.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -14,7 +12,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,7 +32,6 @@ public class User {
         4. Can be used with any SQL databases
      */
     @Lob
-    @JsonIgnore
     @JdbcTypeCode(Types.LONGVARBINARY)
     private byte[] imageData;
 
@@ -56,15 +52,12 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"author", "comments"})
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"author", "post"})
     private List<Comments> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"user", "post"})
     private List<PostLike> likes = new ArrayList<>();
 
     @CreationTimestamp

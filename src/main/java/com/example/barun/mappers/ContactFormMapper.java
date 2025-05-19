@@ -1,6 +1,5 @@
 package com.example.barun.mappers;
 
-
 import com.example.barun.domain.dtos.ContactFormDto;
 import com.example.barun.domain.entities.ContactForm;
 import org.mapstruct.Mapper;

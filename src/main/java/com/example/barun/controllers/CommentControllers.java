@@ -90,11 +90,6 @@ public class CommentControllers {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-//    @DeleteMapping("/deleteAllComment")
-//    public void deleteAllComments(){
-//         commentServiceImpl.deleteAllComments();
-//    }
-
     @DeleteMapping("/{commentId}/deleteComment")
     public ResponseEntity<?> deleteCommentsById(@PathVariable Long commentId){
         Optional<User> loggedInUser = getAuthorizedUser();
@@ -115,19 +110,6 @@ public class CommentControllers {
 
     @GetMapping("/{commentId}/comments")
     public ResponseEntity<?> getCommentsById(@PathVariable Long commentId){
-//        User loggedInUser = getAuthorizedUser();
-//        if(loggedInUser == null){
-//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//        }
-//        Optional<Comments> commentsById = commentServiceImpl.getCommentsById(commentId);
-//        if(commentsById.isPresent()){
-//            if(isCommentOwnedByUser(commentId, loggedInUser)){
-//                return ResponseEntity.ok(commentsById.get());
-//            } else {
-//                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//            }
-//        }
-//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Optional<Comments> comments = commentService.getCommentsById(commentId);
         if(comments.isPresent()){
             CommentDto commentDto = commentMapper.toDto(comments.get());

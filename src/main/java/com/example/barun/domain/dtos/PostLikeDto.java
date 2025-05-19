@@ -2,8 +2,6 @@ package com.example.barun.domain.dtos;
 
 import com.example.barun.domain.PostSummaryDto;
 import com.example.barun.domain.UserSummaryDto;
-import com.example.barun.domain.entities.Post;
-import com.example.barun.domain.entities.User;
 
 public class PostLikeDto {
     private Long id;

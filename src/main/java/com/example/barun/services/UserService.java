@@ -24,7 +24,5 @@ public interface UserService {
     User updateUserInfo(Long id, UpdateUserDataRequest updateUserDataRequest);
     void deleteUser(Long id);
     void deleteUserImageById(Long id);
-    //    void saveUser(User user);
-    //    String verifyTheUser(LoginUserRequest loginUserRequest);
 
 }

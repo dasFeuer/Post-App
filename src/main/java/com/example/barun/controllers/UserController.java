@@ -117,11 +117,6 @@ public class UserController{
                 return user != null
                         ? ResponseEntity.ok(userSummaryDto)
                         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//                if(user != null){
-//                    return new ResponseEntity<>(user, HttpStatus.FOUND);
-//                } else {
-//                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//                }
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -285,7 +280,6 @@ public class UserController{
             try{
                 User user = userService.getUserByUsername(userUsername);
                 UserSummaryDto userByUsername = userMapper.toSummaryDto(user);
-//                return new ResponseEntity<>(userByUsername, HttpStatus.OK);
                 return ResponseEntity.ok(userByUsername);
             } catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -298,10 +292,6 @@ public class UserController{
         if(loggedInUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-
-//        if(!loggedInUser.get().getEmail().equals(email)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
 
         if(!loggedInUser.get().getEmail().equals(email)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);

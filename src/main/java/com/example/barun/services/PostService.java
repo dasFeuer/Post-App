@@ -3,7 +3,6 @@ package com.example.barun.services;
 import com.example.barun.domain.CreatePostRequest;
 import com.example.barun.domain.PatchPostRequest;
 import com.example.barun.domain.UpdatePostRequest;
-import com.example.barun.domain.dtos.CreatePostRequestDto;
 import com.example.barun.domain.entities.Post;
 import org.springframework.web.multipart.MultipartFile;
 

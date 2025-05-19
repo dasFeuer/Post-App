@@ -1,6 +1,5 @@
 package com.example.barun.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,12 +15,10 @@ public class Comments {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-    @JsonIgnoreProperties({"comments", "author"})
     private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    @JsonIgnoreProperties({"comments", "posts"})
     private Post post;
 
     public Long getId() {

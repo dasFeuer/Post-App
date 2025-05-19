@@ -9,8 +9,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaAuditing
 @EnableTransactionManagement
 public class BarunApplication {
+	public static void main(String[] args) {SpringApplication.run(BarunApplication.class, args);
 
-	public static void main(String[] args) {
-		SpringApplication.run(BarunApplication.class, args);
 	}
 }

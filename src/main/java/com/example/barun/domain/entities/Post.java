@@ -1,8 +1,5 @@
 package com.example.barun.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -15,7 +12,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "blogPost")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,11 +26,9 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-    @JsonIgnoreProperties({"posts"})
     private User author;
 
     @Lob
-    @JsonIgnore
     @JdbcTypeCode(Types.LONGVARBINARY)
     private byte[] postImageData;
 
@@ -43,11 +37,9 @@ public class Post {
     private String postImageName;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"post", "author"})
     private List<Comments> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"post", "user"})
     private List<PostLike> likes = new ArrayList<>();
 
     @CreationTimestamp
@@ -58,7 +50,6 @@ public class Post {
     @Column(name = "updatedAt")
     private Date updatedAt;
 
-    @JsonProperty("likeCount")
     public int getLikeCount() {
         return likes.size();
     }

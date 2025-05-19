@@ -24,7 +24,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
 //            throw new UsernameNotFoundException("User not found");
 //        }
 //        return new UserPrincipal(user);
-//    // Will need Username for login and other stuff where username required
+//    // Will need Username for login and other stuff where username is required
 //    }
 //}
 
@@ -33,5 +33,5 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
         User user = userRepository.findByEmail(email).
                 orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return new UserPrincipal(user);
-    }     // Will need email for login and other stuff where username required
+    }     // Will need email for login and other stuff where email is required
 }

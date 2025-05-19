@@ -2,7 +2,6 @@ package com.example.barun.domain;
 
 public class UpdatePostRequest {
     private String title;
-
     private String content;
 
     public UpdatePostRequest() {

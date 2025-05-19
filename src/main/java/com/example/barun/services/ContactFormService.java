@@ -8,7 +8,6 @@ import java.util.Optional;
 
 public interface ContactFormService {
 
-//    void sendEmailOfContactForm(String to, String subject, String body, ContactForm contactForm);
     void sendEmailOfContactForm(EmailBodyDto emailBodyDto);
     List<ContactForm> getAllContactForm();
     void deleteAllContactForm();

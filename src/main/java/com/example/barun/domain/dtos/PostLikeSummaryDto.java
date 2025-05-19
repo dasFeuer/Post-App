@@ -1,6 +1,5 @@
 package com.example.barun.domain.dtos;
 
-import com.example.barun.domain.PostSummaryDto;
 import com.example.barun.domain.UserSummaryDto;
 
 public class PostLikeSummaryDto {

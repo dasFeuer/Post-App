@@ -1,6 +1,5 @@
 package com.example.barun.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -8,7 +7,6 @@ import java.util.Date;
 
 @Entity
 @Table(name = "postReaction")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PostLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,12 +14,10 @@ public class PostLike {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties({"likes", "posts", "comments"})
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    @JsonIgnoreProperties({"likes", "posts", "comments"})
     private Post post;
 
     @CreationTimestamp

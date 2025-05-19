@@ -67,10 +67,6 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-//    public void deleteAllComments(){
-//        commentRepository.deleteAll();
-//    }
-
     @Override
     public Comments updateComments(Long commentId, UpdateCommentRequest updateCommentRequest){
         Optional<Comments> existingComment = commentRepository.findById(commentId);
